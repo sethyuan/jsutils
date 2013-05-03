@@ -36,7 +36,7 @@ var x = js.clone(y);
 
 ### jsutils.extend(dest, src)
 
-Assign any `src` own, non-inherited properties to `dest`, overriding if necessary.
+Assign every `src` own, non-inherited properties to `dest`, overriding if necessary.
 
 ### jsutils.clone(src)
 
