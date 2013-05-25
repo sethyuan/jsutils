@@ -112,3 +112,15 @@ describe("clone", function() {
     y.crit.toString().should.eql(x.crit.toString());
   });
 });
+
+describe("math", function() {
+  var jsm = utils.math;
+
+  it("positive %", function() {
+    jsm.mod(6, 5).should.equal(1);
+  });
+
+  it("negative %", function() {
+    jsm.mod(-6, 5).should.equal(4);
+  });
+});
