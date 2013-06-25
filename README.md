@@ -34,6 +34,8 @@ var x = js.clone(y);
 
 ## API
 
+### General
+
 ### jsutils.extend(dest, src)
 
 Assign every `src` own, non-inherited properties to `dest`, overriding if necessary.
@@ -41,6 +43,12 @@ Assign every `src` own, non-inherited properties to `dest`, overriding if necess
 ### jsutils.clone(src)
 
 Deep clone `src`. Supports simple values, Object, Array, Date and RegExp.
+
+### Math
+
+### jsutils.math.mod(x, y)
+
+Real modulo operation that supports negative numbers.
 
 ## License
 
