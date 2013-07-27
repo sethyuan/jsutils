@@ -124,3 +124,31 @@ describe("math", function() {
     jsm.mod(-6, 5).should.equal(4);
   });
 });
+
+describe("random", function() {
+  it("0 to 9", function() {
+    for (var i = 0; i < 1000; i++) {
+      utils.randomInt(0, 9).should.be.within(0, 9);
+    }
+  });
+
+  it("1 to 10", function() {
+    for (var i = 0; i < 1000; i++) {
+      utils.randomInt(1, 10).should.be.within(1, 10);
+    }
+  });
+
+  it("-10 to 10", function() {
+    for (var i = 0; i < 1000; i++) {
+      var v = utils.randomInt(-10, 10);
+      console.log(v);
+      v.should.be.within(-10, 10);
+    }
+  });
+
+  it("10 to 1", function() {
+    for (var i = 0; i < 1000; i++) {
+      utils.randomInt(10, 1).should.be.within(1, 10);
+    }
+  });
+});
