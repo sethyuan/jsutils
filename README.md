@@ -44,11 +44,21 @@ Assign every `src` own, non-inherited properties to `dest`, overriding if necess
 
 Deep clone `src`. Supports simple values, Object, Array, Date and RegExp.
 
+### jsutils.randomInt(from, to)
+
+Returns random integers between `from` and `to` inclusive. `from` and `to` can be negative.
+
 ### Math
 
 ### jsutils.math.mod(x, y)
 
 Real modulo operation that supports negative numbers.
+
+### Date
+
+### jsutils.date.isDst(date)
+
+Returns true if given `date` is DST, false otherwise.
 
 ## License
 

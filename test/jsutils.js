@@ -113,19 +113,14 @@ describe("clone", function() {
   });
 });
 
-describe("math", function() {
-  var jsm = utils.math;
-
-  it("positive %", function() {
-    jsm.mod(6, 5).should.equal(1);
-  });
-
-  it("negative %", function() {
-    jsm.mod(-6, 5).should.equal(4);
-  });
-});
-
 describe("random", function() {
+  it("1 to 1", function() {
+    for (var i = 0; i < 1000; i++) {
+      var n = utils.randomInt(1, 1);
+      n.should.be.within(1, 1);
+    }
+  });
+
   it("0 to 9", function() {
     for (var i = 0; i < 1000; i++) {
       utils.randomInt(0, 9).should.be.within(0, 9);
@@ -141,7 +136,6 @@ describe("random", function() {
   it("-10 to 10", function() {
     for (var i = 0; i < 1000; i++) {
       var v = utils.randomInt(-10, 10);
-      console.log(v);
       v.should.be.within(-10, 10);
     }
   });
@@ -150,5 +144,17 @@ describe("random", function() {
     for (var i = 0; i < 1000; i++) {
       utils.randomInt(10, 1).should.be.within(1, 10);
     }
+  });
+});
+
+describe("math", function() {
+  var jsm = utils.math;
+
+  it("positive %", function() {
+    jsm.mod(6, 5).should.equal(1);
+  });
+
+  it("negative %", function() {
+    jsm.mod(-6, 5).should.equal(4);
   });
 });
