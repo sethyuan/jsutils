@@ -21,33 +21,25 @@ describe("extend", function() {
   it("src is no object nor function", function() {
     var x = {name: "Seth"};
     var y = 20;
-    (function() {
-      utils.extend(x, y);
-    }).should.throw();
+    utils.extend(x, y).should.be.equal(x);
   });
 
   it("dest is no object nor function", function() {
     var x = 20;
     var y = {name: "Seth"};
-    (function() {
-      utils.extend(x, y);
-    }).should.throw();
+    utils.extend(x, y).should.be.equal(x);
   });
 
   it("src is null", function() {
     var x = {name: "Seth"};
     var y = null;
-    (function() {
-      utils.extend(x, y);
-    }).should.throw();
+    utils.extend(x, y).should.be.equal(x);
   });
 
   it("dest is null", function() {
     var x = null;
     var y = {name: "Seth"};
-    (function() {
-      utils.extend(x, y);
-    }).should.throw();
+    should.not.exist(utils.extend(x, y));
   });
 
   it("src is function", function() {
