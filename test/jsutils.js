@@ -139,6 +139,16 @@ describe("random", function() {
   });
 });
 
+
+describe("shuffle", function() {
+  it("shuffle", function() {
+    var nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    utils.shuffle(nums);
+    console.log(nums);
+    nums.should.have.length(10);
+  });
+});
+
 describe("math", function() {
   var jsm = utils.math;
 
