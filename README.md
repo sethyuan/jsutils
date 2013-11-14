@@ -48,6 +48,10 @@ Deep clone `src`. Supports simple values, Object, Array, Date and RegExp.
 
 Returns random integers between `from` and `to` inclusive. `from` and `to` can be negative.
 
+### jsutils.shuffle(array)
+
+Shuffle `array` in place, and return it.
+
 ### Math
 
 ### jsutils.math.mod(x, y)
