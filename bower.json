@@ -1,0 +1,15 @@
+{
+  "name": "jsutils",
+  "main": "jsutils.min.js",
+  "version": "0.4.0",
+  "homepage": "https://github.com/sethyuan/jsutils",
+  "authors": [
+    "Seth Yuan <cavingdeep@gmail.com>"
+  ],
+  "description": "Utilities for JavaScript.",
+  "moduleType": [
+    "globals",
+    "node"
+  ],
+  "license": "MIT"
+}

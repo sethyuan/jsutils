@@ -38,6 +38,9 @@
   "readmeFilename": "README.md",
   "devDependencies": {
     "chai": "latest",
+    "gulp": "latest",
+    "gulp-concat": "latest",
+    "gulp-uglify": "latest",
     "mocha": "latest"
   }
 }
