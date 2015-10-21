@@ -1,140 +1,135 @@
-var utils = require("../"),
-    should = require("should");
+"use strict";
+
+var jsutils = require("../");
+var expect = require("chai").expect;
 
 describe("extend", function() {
   it("simple object", function() {
     var x = {name: "Seth"};
     var y = {age: 30};
-    var z = utils.extend(x, y);
-    z.should.equal(x);
-    x.should.have.property("age").equal(y.age);
+    var z = jsutils.extend(x, y);
+    expect(z).equal(x);
+    expect(x).have.property("age").equal(y.age);
   });
 
   it("simple object override", function() {
     var x = {name: "Seth"};
     var y = {age: 30, name: "Fiona"};
-    utils.extend(x, y);
-    x.should.have.property("age").equal(y.age);
-    x.name.should.eql("Fiona");
+    jsutils.extend(x, y);
+    expect(x).have.property("age").equal(y.age);
+    expect(x.name).equal(y.name);
   });
 
   it("src is no object nor function", function() {
     var x = {name: "Seth"};
     var y = 20;
-    utils.extend(x, y).should.be.equal(x);
+    expect(jsutils.extend(x, y)).equal(x);
   });
 
   it("dest is no object nor function", function() {
     var x = 20;
     var y = {name: "Seth"};
-    utils.extend(x, y).should.be.equal(x);
+    expect(jsutils.extend(x, y)).equal(x);
   });
 
   it("src is null", function() {
     var x = {name: "Seth"};
     var y = null;
-    utils.extend(x, y).should.be.equal(x);
+    expect(jsutils.extend(x, y)).equal(x);
   });
 
   it("dest is null", function() {
     var x = null;
     var y = {name: "Seth"};
-    should.not.exist(utils.extend(x, y));
+    expect(jsutils.extend(x, y)).equal(x);
   });
 
   it("src is function", function() {
     var x = {name: "Seth"};
     var y = function() {};
     y.foo = "foo";
-    utils.extend(x, y).should.have.property("foo").equal(y.foo);
+    expect(jsutils.extend(x, y)).have.property("foo").equal(y.foo);
   });
 
   it("src is array", function() {
     var x = {name: "Seth"};
     var y = {toys: ["car", "xbox"] };
-    utils.extend(x, y);
-    x.should.have.property("toys").equal(y.toys);
+    jsutils.extend(x, y);
+    expect(x).have.property("toys").equal(y.toys);
   });
 });
 
 describe("clone", function() {
   it("simple object", function() {
     var x = {name: "Seth"};
-    var y = utils.clone(x);
-    y.should.have.property("name").eql(x.name);
+    var y = jsutils.clone(x);
+    expect(y).have.property("name").equal(x.name);
   });
 
   it("object with array", function() {
     var x = {name: "Seth", toys: ["car", "xbox"]};
-    var y = utils.clone(x);
-    y.should.have.property("toys");
-    y.toys.should.not.equal(x.toys);
-    y.toys.should.eql(x.toys);
+    var y = jsutils.clone(x);
+    expect(y).have.property("toys").not.equal(x.toys);
+    expect(y.toys).deep.equal(x.toys);
   });
 
   it("object with complex array", function() {
     var x = {name: "Seth", toys: ["car", {kind: "game console", name: "xbox"}]};
-    var y = utils.clone(x);
-    y.should.have.property("toys");
-    y.toys.should.not.equal(x.toys);
-    y.toys.should.eql(x.toys);
+    var y = jsutils.clone(x);
+    expect(y).have.property("toys").not.equal(x.toys);
+    expect(y.toys).deep.equal(x.toys);
   });
 
   it("object with object", function() {
     var x = {name: "Seth", edu: {elementary: "xx"}};
-    var y = utils.clone(x);
-    y.should.have.property("edu");
-    y.edu.should.not.equal(x.edu);
-    y.edu.should.have.property("elementary").eql(x.edu.elementary);
+    var y = jsutils.clone(x);
+    expect(y).have.property("edu").not.equal(x.edu);
+    expect(y.edu).have.property("elementary").equal(x.edu.elementary);
   });
 
   it("object with Date", function() {
     var x = {name: "Seth", birth: new Date(2000, 12, 1)};
-    var y = utils.clone(x);
-    y.should.have.property("birth");
-    y.birth.should.not.equal(x.birth);
-    y.birth.getTime().should.eql(x.birth.getTime());
+    var y = jsutils.clone(x);
+    expect(y).have.property("birth").not.equal(x.birth);
+    expect(y.birth.getTime()).equal(x.birth.getTime());
   });
 
   it("object with RegExp", function() {
     var x = {name: "Seth", crit: /abc/g};
-    var y = utils.clone(x);
-    y.should.have.property("crit");
-    y.crit.should.not.equal(x.crit);
-    y.crit.toString().should.eql(x.crit.toString());
+    var y = jsutils.clone(x);
+    expect(y).have.property("crit").not.equal(x.crit);
+    expect(y.crit.toString()).equal(x.crit.toString());
   });
 });
 
 describe("random", function() {
   it("1 to 1", function() {
     for (var i = 0; i < 1000; i++) {
-      var n = utils.randomInt(1, 1);
-      n.should.be.within(1, 1);
+      expect(jsutils.randomInt(1, 1)).within(1, 1);
     }
   });
 
   it("0 to 9", function() {
     for (var i = 0; i < 1000; i++) {
-      utils.randomInt(0, 9).should.be.within(0, 9);
+      expect(jsutils.randomInt(0, 9)).within(0, 9);
     }
   });
 
   it("1 to 10", function() {
     for (var i = 0; i < 1000; i++) {
-      utils.randomInt(1, 10).should.be.within(1, 10);
+      expect(jsutils.randomInt(1, 10)).within(1, 10);
     }
   });
 
   it("-10 to 10", function() {
     for (var i = 0; i < 1000; i++) {
-      var v = utils.randomInt(-10, 10);
-      v.should.be.within(-10, 10);
+      expect(jsutils.randomInt(-10, 10)).within(-10, 10);
     }
   });
 
   it("10 to 1", function() {
     for (var i = 0; i < 1000; i++) {
-      utils.randomInt(10, 1).should.be.within(1, 10);
+      expect(jsutils.randomInt(10, 1)).within(1, 10);
     }
   });
 });
@@ -143,20 +138,20 @@ describe("random", function() {
 describe("shuffle", function() {
   it("shuffle", function() {
     var nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    utils.shuffle(nums);
+    jsutils.shuffle(nums);
     console.log(nums);
-    nums.should.have.length(10);
+    expect(nums).have.length(10);
   });
 });
 
 describe("math", function() {
-  var jsm = utils.math;
+  var jsm = jsutils.math;
 
   it("positive %", function() {
-    jsm.mod(6, 5).should.equal(1);
+    expect(jsm.mod(6, 5)).equal(1);
   });
 
   it("negative %", function() {
-    jsm.mod(-6, 5).should.equal(4);
+    expect(jsm.mod(-6, 5)).equal(4);
   });
 });
