@@ -7,7 +7,7 @@ var uglify = require("gulp-uglify");
 gulp.task("default", ["min"]);
 
 gulp.task("min", function() {
-  return gulp.src("lib/**/*.js")
+  return gulp.src(["lib/jsutils.js", "lib/!(jsutils).js"])
     .pipe(concat("jsutils.min.js"))
     .pipe(uglify())
     .pipe(gulp.dest("."));
