@@ -1,3 +1,5 @@
+require("source-map-support").install()
+
 import {
   extend,
   clone,

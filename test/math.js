@@ -1,3 +1,5 @@
+require("source-map-support").install()
+
 import {mod} from "../lib/math"
 import {expect} from "chai"
 
