@@ -1,66 +1,51 @@
 require("source-map-support").install()
 
 import {
-  extend,
+  merge,
   clone,
   shuffle,
   randomInt,
 } from "../lib/jsutils"
 import {expect} from "chai"
 
-describe("extend", () => {
-  it("simple object", () => {
-    const x = {name: "Seth"}
-    const y = {age: 30}
-    const z = extend(x, y)
-    expect(z).equal(x)
-    expect(x).have.property("age").equal(y.age)
+describe("merge", () => {
+  it("nested objects", () => {
+    const x = {
+      color: "red",
+      ":hover": {
+        color: "yellow"
+      }
+    }
+    const y = merge(x, {
+      ":hover": {
+        backgroundColor: "white",
+        color: "purple",
+      }
+    })
+    expect(y[":hover"].color).equal("purple")
+    expect(y[":hover"]).have.property("backgroundColor").equal("white")
   })
 
-  it("simple object override", () => {
-    const x = {name: "Seth"}
-    const y = {age: 30, name: "Fiona"}
-    extend(x, y)
-    expect(x).have.property("age").equal(y.age)
-    expect(x.name).equal(y.name)
+  it("nested array with simple value", () => {
+    const x = {
+      name: "Seth",
+      hobbies: ["soccer"]
+    }
+    const y = merge(x, {
+      hobbies: ["football"]
+    })
+    expect(y.hobbies).eql(["football"])
   })
 
-  it("src is no object nor function", () => {
-    const x = {name: "Seth"}
-    const y = 20
-    expect(extend(x, y)).equal(x)
-  })
-
-  it("dest is no object nor function", () => {
-    const x = 20
-    const y = {name: "Seth"}
-    expect(extend(x, y)).equal(x)
-  })
-
-  it("src is null", () => {
-    const x = {name: "Seth"}
-    const y = null
-    expect(extend(x, y)).equal(x)
-  })
-
-  it("dest is null", () => {
-    const x = null
-    const y = {name: "Seth"}
-    expect(extend(x, y)).equal(x)
-  })
-
-  it("src is function", () => {
-    const x = {name: "Seth"}
-    const y = function() {}
-    y.foo = "foo"
-    expect(extend(x, y)).have.property("foo").equal(y.foo)
-  })
-
-  it("src is array", () => {
-    const x = {name: "Seth"}
-    const y = {toys: ["car", "xbox"] }
-    extend(x, y)
-    expect(x).have.property("toys").equal(y.toys)
+  it("nested array with object value", () => {
+    const x = {
+      name: "Seth",
+      hobbies: [{name: "soccer"}]
+    }
+    const y = merge(x, {
+      hobbies: [{years: 1}, {name: "football", years: 2}]
+    })
+    expect(y.hobbies).eql([{name: "soccer", years: 1}, {name: "football", years: 2}])
   })
 })
 

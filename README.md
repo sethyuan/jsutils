@@ -11,34 +11,40 @@ $ npm install jsutils
 ## Example
 
 ```js
-var js = require("jsutils");
+import {merge, clone} from "jsutils"
+import {mod} from "jsutils/lib/math"
 
-// Extend
-var x = {
-  name: "x"
+// Merge
+const x = {
+  name: "x",
+  hobbies: ["soccer"]
 };
-var y = {
+const y = {
   name: "y",
-  val: 10
+  val: 10,
+  hobbies: ["football"]
 };
-js.extend(x, y); // returns x
+merge(x, y); // returns x
 
 // Clone
-var y = {
+const y = {
   name: "y",
   attrs: ["a", "b", {name: "c", pos: 3}],
   modDate: new Date()
 };
-var x = js.clone(y);
+const x = clone(y);
+
+// Mod
+console.log(mod(-6, 5)) // 4
 ```
 
 ## API
 
 ### General
 
-### jsutils.extend(dest, src)
+### jsutils.merge(dest, ...srcs)
 
-Assign every `src` own, non-inherited properties to `dest`, overriding if necessary.
+Assign every `src` own, non-inherited properties to `dest`, merging if necessary. Arrays are also merged.
 
 ### jsutils.clone(src)
 

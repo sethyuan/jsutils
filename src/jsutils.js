@@ -1,17 +1,31 @@
-export function extend(dest, src) {
-  if (dest == null || src == null) return dest
-
-  const destType = typeof dest
-  const srcType = typeof src
-
-  if ((destType !== "object" && destType !== "function")
-      || (srcType !== "object" && srcType !== "function")) return dest
+function mergeBase(dest, src) {
+  if (!(src && src.constructor === Object)) return dest
 
   for (let key of Object.keys(src)) {
-    dest[key] = src[key]
+    const d = dest[key]
+    const s = src[key]
+
+    if (d && d.constructor === Object && s && s.constructor === Object) {
+      mergeBase(d, s)
+    } else if (Array.isArray(d) && Array.isArray(s)) {
+      for (let i = 0; i < s.length; i++) {
+        if (d[i] && d[i].constructor === Object
+            && s[i] && s[i].constructor === Object) {
+          mergeBase(d[i], s[i])
+        } else {
+          d[i] = s[i]
+        }
+      }
+    } else {
+      dest[key] = s
+    }
   }
 
   return dest
+}
+
+export function merge(dest, ...srcs) {
+  return srcs.reduce((res, src) => mergeBase(res, src), dest)
 }
 
 export function clone(src) {
