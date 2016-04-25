@@ -17,7 +17,7 @@ function mergeBase(dest, src) {
         }
       }
     } else {
-      dest[key] = s
+      dest[key] = clone(s)
     }
   }
 
