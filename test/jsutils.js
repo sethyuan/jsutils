@@ -22,6 +22,7 @@ describe("merge", () => {
         color: "purple",
       }
     })
+    expect(y.color).equal("red")
     expect(y[":hover"].color).equal("purple")
     expect(y[":hover"]).have.property("backgroundColor").equal("white")
   })
