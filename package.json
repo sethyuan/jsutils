@@ -38,7 +38,11 @@
   ],
   "author": "Seth Yuan <sethyuan@gmail.com>",
   "license": "MIT",
-  "homepage": "https://gitee.com/sethyuan/reactutils#readme",
+  "homepage": "https://gitee.com/sethyuan/jsutils#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "devDependencies": {
     "@babel/core": "^7.15.0",
     "@babel/preset-env": "^7.15.0",
