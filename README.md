@@ -11,28 +11,7 @@ $ npm install jsutils
 ## Example
 
 ```js
-import {merge, clone} from "jsutils"
-import {mod} from "jsutils/lib/math"
-
-// Merge
-const x = {
-  name: "x",
-  hobbies: ["soccer"]
-};
-const y = {
-  name: "y",
-  val: 10,
-  hobbies: ["football"]
-};
-merge(x, y); // returns x
-
-// Clone
-const y = {
-  name: "y",
-  attrs: ["a", "b", {name: "c", pos: 3}],
-  modDate: new Date()
-};
-const x = clone(y);
+import { mod } from "jsutils"
 
 // Mod
 console.log(mod(-6, 5)) // 4
@@ -42,21 +21,9 @@ console.log(mod(-6, 5)) // 4
 
 ### General
 
-### jsutils.merge(dest, ...srcs)
-
-Assign every `src` own, non-inherited properties to `dest`, merging if necessary. Arrays are also merged.
-
-### jsutils.clone(src)
-
-Deep clone `src`. Supports simple values, Object, Array, Date and RegExp.
-
 ### jsutils.randomInt(from, to)
 
 Returns random integers between `from` and `to` inclusive. `from` and `to` can be negative.
-
-### jsutils.shuffle(array)
-
-Shuffle `array` in place, and return it.
 
 ### Math
 
