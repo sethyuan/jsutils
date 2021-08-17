@@ -1,35 +1,17 @@
-interface Node<T> {
-  val: T
-  next?: Node<T>
-}
+import { LinkedList } from "./linked-list"
 
 export class Queue<T> {
-  first?: Node<T>
-  last?: Node<T>
-  length = 0
+  _list = new LinkedList<T>()
 
-  push(el: T) {
-    const node = {
-      val: el,
-      next: undefined,
-    }
-    if (this.last === undefined) {
-      this.first = node
-    } else {
-      this.last.next = node
-    }
-    this.last = node
-    this.length++
+  get length() {
+    return this._list.length
+  }
+
+  push(val: T) {
+    this._list.push(val)
   }
 
   pop() {
-    const head = this.first
-    if (head === undefined) return undefined
-    this.length--
-    if (head.next === undefined) {
-      this.last = undefined
-    }
-    this.first = head.next
-    return head.val
+    return this._list.shift()
   }
 }
