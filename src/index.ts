@@ -1,9 +1,11 @@
 export * from "./date"
+export * from "./doubly-linked-list"
 export * from "./graph"
 export * from "./linked-list"
 export * from "./math"
 export * from "./queue"
 export * from "./seq"
+export * from "./stack"
 
 /**
  * Returns random integers between from and to inclusive. from and to can be negative.

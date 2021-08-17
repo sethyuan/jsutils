@@ -18,22 +18,22 @@ class Node<T> {
   }
 }
 
-export function dfs<T>(
+export function preOrderTraverse<T>(
   root: TreeNode<T>,
   handler: NodeHandler<T>,
-  enterNodeHandler?: NodeHandler<T>,
-  leaveNodeHandler?: NodeHandler<T>,
+  enterHandler?: NodeHandler<T>,
+  leaveHandler?: NodeHandler<T>,
 ) {
   const stack = [new Node(root, -1)]
   while (stack.length > 0) {
     const { node, index, isSep } = stack.pop()!
     if (isSep) {
-      if (leaveNodeHandler?.(node, index)) break
+      if (leaveHandler?.(node, index)) break
       continue
     }
     if (handler(node, index)) break
     if (node.nodes?.length) {
-      if (enterNodeHandler?.(node, index)) break
+      if (enterHandler?.(node, index)) break
       stack.push(
         new Node(node, index, true),
         ...reverseArray(node.nodes.map((n, i) => new Node(n, i))),

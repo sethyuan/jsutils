@@ -2,15 +2,17 @@ import * as seq from "./seq"
 
 class Node<T> {
   val: T
+  prev?: Node<T>
   next?: Node<T>
 
-  constructor(val: T, next?: Node<T>) {
+  constructor(val: T, prev?: Node<T>, next?: Node<T>) {
     this.val = val
+    this.prev = prev
     this.next = next
   }
 }
 
-export class LinkedList<T> implements Iterable<T> {
+export class DLinkedList<T> implements Iterable<T> {
   first?: Node<T>
   last?: Node<T>
   _length = 0
@@ -25,9 +27,24 @@ export class LinkedList<T> implements Iterable<T> {
     this._length--
     if (first.next === undefined) {
       this.last = undefined
+    } else {
+      first.next.prev = undefined
     }
     this.first = first.next
     return first.val
+  }
+
+  pop() {
+    const last = this.last
+    if (last === undefined) return undefined
+    this._length--
+    if (last.prev === undefined) {
+      this.first = undefined
+    } else {
+      last.prev.next = undefined
+    }
+    this.last = last.prev
+    return last.val
   }
 
   unshift(val: T) {
@@ -37,6 +54,7 @@ export class LinkedList<T> implements Iterable<T> {
       this.last = node
     } else {
       node.next = first
+      first.prev = node
     }
     this.first = node
     this._length++
@@ -49,6 +67,7 @@ export class LinkedList<T> implements Iterable<T> {
       this.first = node
     } else {
       last.next = node
+      node.prev = last
     }
     this.last = node
     this._length++
@@ -67,11 +86,16 @@ export class LinkedList<T> implements Iterable<T> {
       }
       const newNode = new Node(val)
       curr!.next = newNode
+      newNode.prev = curr
       curr = newNode
     }
 
+    const first = this.first
     if (curr !== undefined) {
-      curr.next = this.first
+      curr.next = first
+      if (first !== undefined) {
+        first.prev = curr
+      }
     }
     if (node !== undefined) {
       this.first = node
@@ -92,6 +116,7 @@ export class LinkedList<T> implements Iterable<T> {
       }
       const newNode = new Node(val)
       curr!.next = newNode
+      newNode.prev = curr
       curr = newNode
     }
 
@@ -100,6 +125,9 @@ export class LinkedList<T> implements Iterable<T> {
       this.first = node
     } else {
       last.next = node
+      if (node !== undefined) {
+        node.prev = last
+      }
     }
     this.last = node
     this._length += count
@@ -131,7 +159,7 @@ export class LinkedList<T> implements Iterable<T> {
   }
 
   map<U>(fn: (_: T) => U) {
-    const newList = new LinkedList<U>()
+    const newList = new DLinkedList<U>()
     for (const x of this) {
       newList.push(fn(x))
     }
@@ -139,7 +167,7 @@ export class LinkedList<T> implements Iterable<T> {
   }
 
   filter(predicate: (_: T) => boolean) {
-    const newList = new LinkedList<T>()
+    const newList = new DLinkedList<T>()
     for (const x of this) {
       if (predicate(x)) {
         newList.push(x)
