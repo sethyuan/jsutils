@@ -1,7 +1,13 @@
-import { dfs, TreeNode } from "../src/index"
+import {
+  breadthFirstTraverse,
+  LinkedList,
+  postOrderTraverse,
+  preOrderTraverse,
+  TreeNode,
+} from "../src/index"
 
 describe("Graph", () => {
-  describe("dfs", () => {
+  describe("preOrderTraverse", () => {
     it("find path", () => {
       function findPath<T>(
         obj: TreeNode<T>,
@@ -29,7 +35,7 @@ describe("Graph", () => {
           return false
         }
 
-        dfs(obj, handler, enter, leave)
+        preOrderTraverse(obj, handler, enter, leave)
 
         return path
       }
@@ -85,31 +91,26 @@ describe("Graph", () => {
         const stack: number[] = []
 
         function handler(node: TreeNode<Node>) {
-          if (!node.op) {
+          if (node.op) {
+            stack.push(NaN)
+          } else if (node.val) {
             stack.push(node.val)
           }
           return false
         }
 
-        function enter(node: TreeNode<Node>) {
-          if (node.op) {
-            stack.push(NaN)
-          }
-          return false
-        }
-
         function leave(node: TreeNode<Node>) {
-          const vals = []
+          const vals = new LinkedList<number>()
           let val = stack.pop()
           while (!Number.isNaN(val)) {
-            vals.push(val)
+            vals.unshift(val)
             val = stack.pop()
           }
-          stack.push(fns[node.op](vals))
+          stack.push(fns[node.op](Array.from(vals)))
           return false
         }
 
-        dfs(expr, handler, enter, leave)
+        preOrderTraverse(expr, handler, null, leave)
 
         return stack.pop()
       }
@@ -121,7 +122,7 @@ describe("Graph", () => {
             val: 2,
           },
           {
-            op: "+",
+            op: "-",
             nodes: [
               {
                 val: 3,
@@ -134,11 +135,88 @@ describe("Graph", () => {
         ],
       }
 
-      expect(calc(expr1)).toBe(14)
+      expect(calc(expr1)).toBe(-2)
     })
   })
 
-  // describe("bfs", () => {
-  //   it("find path", () => {})
-  // })
+  describe("postOrderTraverse", () => {
+    it("find people in an org", () => {
+      const org = {
+        name: "corp a",
+        nodes: [
+          {
+            name: "dep b",
+            nodes: [
+              {
+                name: "p1",
+              },
+            ],
+          },
+          {
+            name: "dep c",
+            nodes: [
+              {
+                name: "p2",
+              },
+              {
+                name: "p3",
+              },
+            ],
+          },
+          {
+            name: "p0",
+          },
+        ],
+      }
+
+      postOrderTraverse(
+        org,
+        (node: TreeNode<{ name: string }>, index: number) => {
+          if (!node.nodes && node.name === "p2") {
+            expect(index).toBe(0)
+            return true
+          }
+          return false
+        },
+      )
+    })
+  })
+
+  describe("breadthFirstTraverse", () => {
+    it("check order", () => {
+      const tree = {
+        id: "A",
+        nodes: [
+          {
+            id: "B",
+            nodes: [
+              {
+                id: "D",
+              },
+              {
+                id: "E",
+              },
+            ],
+          },
+          {
+            id: "C",
+            nodes: [
+              {
+                id: "F",
+              },
+              {
+                id: "G",
+              },
+            ],
+          },
+        ],
+      }
+      const arr = []
+      breadthFirstTraverse(tree, ({ id }: TreeNode<{ id: string }>) => {
+        arr.push(id)
+        return false
+      })
+      expect(arr).toEqual(["A", "B", "C", "D", "E", "F", "G"])
+    })
+  })
 })
