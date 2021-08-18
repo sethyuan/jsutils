@@ -27,6 +27,7 @@ export class LinkedList<T> implements Iterable<T> {
       this.last = undefined
     }
     this.first = first.next
+    first.next = undefined
     return first.val
   }
 

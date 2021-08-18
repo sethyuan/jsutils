@@ -49,6 +49,7 @@
     "@babel/preset-typescript": "^7.15.0",
     "@rollup/plugin-node-resolve": "^13.0.4",
     "@rollup/plugin-typescript": "^8.2.3",
+    "@types/babel__core": "^7.1.15",
     "@types/jest": "^27.0.1",
     "babel-jest": "^27.0.6",
     "jest": "^27.0.6",

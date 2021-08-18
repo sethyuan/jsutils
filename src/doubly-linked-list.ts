@@ -31,6 +31,7 @@ export class DLinkedList<T> implements Iterable<T> {
       first.next.prev = undefined
     }
     this.first = first.next
+    first.next = undefined
     return first.val
   }
 
@@ -44,6 +45,7 @@ export class DLinkedList<T> implements Iterable<T> {
       last.prev.next = undefined
     }
     this.last = last.prev
+    last.prev = undefined
     return last.val
   }
 
