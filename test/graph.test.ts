@@ -3,19 +3,15 @@ import {
   LinkedList,
   postOrderTraverse,
   preOrderTraverse,
-  TreeNode,
 } from "../src/index"
 
 describe("Graph", () => {
   describe("preOrderTraverse", () => {
     it("find path", () => {
-      function findPath<T>(
-        obj: TreeNode<T>,
-        predicate: (_: TreeNode<T>) => boolean,
-      ) {
+      function findPath<T>(obj: T, predicate: (_: T) => boolean) {
         const path = []
 
-        function handler(node: TreeNode<T>, i: number) {
+        function onNode(node: T, i: number) {
           const found = predicate(node)
           if (found) {
             path.push(i)
@@ -23,19 +19,19 @@ describe("Graph", () => {
           return found
         }
 
-        function enter(node: TreeNode<T>, i: number) {
+        function onNodeEnter(node: T, i: number) {
           if (i > -1) {
             path.push(i)
           }
           return false
         }
 
-        function leave(node: TreeNode<T>) {
+        function onNodeLeave(node: T) {
           path.pop()
           return false
         }
 
-        preOrderTraverse(obj, handler, enter, leave)
+        preOrderTraverse(obj, { onNode, onNodeEnter, onNodeLeave })
 
         return path
       }
@@ -78,7 +74,7 @@ describe("Graph", () => {
     })
 
     it("calc", () => {
-      type Node = { val?: number; op?: "+" | "-" | "*" | "/" }
+      type Node = { val?: number; op?: "+" | "-" | "*" | "/"; nodes?: Node[] }
 
       const fns = {
         "+": (numbers: number[]) => numbers.reduce((a, b) => a + b),
@@ -87,10 +83,10 @@ describe("Graph", () => {
         "/": (numbers: number[]) => numbers.reduce((a, b) => a / b),
       }
 
-      function calc(expr: TreeNode<Node>) {
+      function calc(expr: Node) {
         const stack: number[] = []
 
-        function handler(node: TreeNode<Node>) {
+        function onNode(node: Node) {
           if (node.op) {
             stack.push(NaN)
           } else if (node.val) {
@@ -99,7 +95,7 @@ describe("Graph", () => {
           return false
         }
 
-        function leave(node: TreeNode<Node>) {
+        function onNodeLeave(node: Node) {
           const vals = new LinkedList<number>()
           let val = stack.pop()
           while (!Number.isNaN(val)) {
@@ -110,12 +106,12 @@ describe("Graph", () => {
           return false
         }
 
-        preOrderTraverse(expr, handler, null, leave)
+        preOrderTraverse(expr, { onNode, onNodeLeave })
 
         return stack.pop()
       }
 
-      const expr1: TreeNode<Node> = {
+      const expr1: Node = {
         op: "*",
         nodes: [
           {
@@ -141,6 +137,11 @@ describe("Graph", () => {
 
   describe("postOrderTraverse", () => {
     it("find people in an org", () => {
+      interface Node {
+        name: string
+        nodes?: Node[]
+      }
+
       const org = {
         name: "corp a",
         nodes: [
@@ -169,21 +170,25 @@ describe("Graph", () => {
         ],
       }
 
-      postOrderTraverse(
-        org,
-        (node: TreeNode<{ name: string }>, index: number) => {
+      postOrderTraverse(org, {
+        onNode(node: Node, index: number) {
           if (!node.nodes && node.name === "p2") {
             expect(index).toBe(0)
             return true
           }
           return false
         },
-      )
+      })
     })
   })
 
   describe("breadthFirstTraverse", () => {
     it("check order", () => {
+      interface Node {
+        id: string
+        nodes?: Node[]
+      }
+
       const tree = {
         id: "A",
         nodes: [
@@ -212,9 +217,11 @@ describe("Graph", () => {
         ],
       }
       const arr = []
-      breadthFirstTraverse(tree, ({ id }: TreeNode<{ id: string }>) => {
-        arr.push(id)
-        return false
+      breadthFirstTraverse(tree, {
+        onNode({ id }: Node) {
+          arr.push(id)
+          return false
+        },
       })
       expect(arr).toEqual(["A", "B", "C", "D", "E", "F", "G"])
     })

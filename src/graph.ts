@@ -1,85 +1,103 @@
 import { Queue } from "./queue"
 import { reverseArray } from "./seq"
 
-export type TreeNode<T extends { [key: string]: any }> = T & {
-  nodes?: TreeNode<T>[]
-}
-
-type NodeHandler<T> = (node: TreeNode<T>, index: number) => boolean
-
 class Node<T> {
-  node: TreeNode<T>
+  node: T
   index: number
   isSep?: boolean
 
-  constructor(node: TreeNode<T>, index: number, isSep?: boolean) {
+  constructor(node: T, index: number, isSep?: boolean) {
     this.node = node
     this.index = index
     this.isSep = isSep
   }
 }
 
-export function preOrderTraverse<T>(
-  root: TreeNode<T>,
-  handler: NodeHandler<T>,
-  enterHandler?: NodeHandler<T>,
-  leaveHandler?: NodeHandler<T>,
+type NodeHandler<T> = (node: T, index: number) => boolean | void
+
+type PrePostOptions<T> = {
+  children?: (node: T) => T[] | undefined
+  onNode?: NodeHandler<T>
+  onNodeEnter?: NodeHandler<T>
+  onNodeLeave?: NodeHandler<T>
+}
+
+export function preOrderTraverse<T extends Record<string, any>>(
+  root: T,
+  {
+    children = (node: T) => node.nodes,
+    onNode,
+    onNodeEnter,
+    onNodeLeave,
+  }: PrePostOptions<T> = {},
 ) {
   const stack = [new Node(root, -1)]
   while (stack.length > 0) {
     const { node, index, isSep } = stack.pop()!
     if (isSep) {
-      if (leaveHandler?.(node, index)) break
+      if (onNodeLeave?.(node, index)) break
       continue
     }
-    if (handler(node, index)) break
-    if (node.nodes?.length) {
-      if (enterHandler?.(node, index)) break
+    if (onNode?.(node, index)) break
+    const subnodes = children(node)
+    if (subnodes?.length) {
+      if (onNodeEnter?.(node, index)) break
       stack.push(
         new Node(node, index, true),
-        ...reverseArray(node.nodes.map((n, i) => new Node(n, i))),
+        ...reverseArray(subnodes.map((n, i) => new Node(n, i))),
       )
     }
   }
 }
 
-export function postOrderTraverse<T>(
-  root: TreeNode<T>,
-  handler: NodeHandler<T>,
-  enterHandler?: NodeHandler<T>,
-  leaveHandler?: NodeHandler<T>,
+export function postOrderTraverse<T extends Record<string, any>>(
+  root: T,
+  {
+    children = (node: T) => node.nodes,
+    onNode,
+    onNodeEnter,
+    onNodeLeave,
+  }: PrePostOptions<T> = {},
 ) {
   const stack = [new Node(root, -1)]
   while (stack.length > 0) {
     const { node, index, isSep } = stack.pop()!
     if (isSep) {
-      if (handler(node, index)) break
-      if (leaveHandler?.(node, index)) break
+      if (onNode?.(node, index)) break
+      if (onNodeLeave?.(node, index)) break
       continue
     }
-    if (node.nodes?.length) {
-      if (enterHandler?.(node, index)) break
+    const subnodes = children(node)
+    if (subnodes?.length) {
+      if (onNodeEnter?.(node, index)) break
       stack.push(
         new Node(node, index, true),
-        ...reverseArray(node.nodes.map((n, i) => new Node(n, i))),
+        ...reverseArray(subnodes.map((n, i) => new Node(n, i))),
       )
     } else {
-      if (handler(node, index)) break
+      if (onNode?.(node, index)) break
     }
   }
 }
 
-export function breadthFirstTraverse<T>(
-  root: TreeNode<T>,
-  handler: (_: TreeNode<T>) => boolean,
+export function breadthFirstTraverse<T extends Record<string, any>>(
+  root: T,
+  {
+    children = (node: T) => node.nodes,
+    onNode,
+  }: {
+    children?: (node: T) => T[] | undefined
+    onNode?: (node: T) => boolean | void
+  } = {},
 ) {
-  const queue = new Queue<TreeNode<T>>()
+  const queue = new Queue<T>()
   queue.push(root)
   while (queue.length > 0) {
     const node = queue.pop()!
-    if (handler(node)) break
-    if (node.nodes?.length) {
-      for (const n of node.nodes) {
+    if (onNode?.(node)) break
+    const subnodes = children(node)
+    if (subnodes?.length) {
+      for (const n of subnodes) {
         queue.push(n)
       }
     }
