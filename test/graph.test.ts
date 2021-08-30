@@ -1,5 +1,6 @@
 import {
   breadthFirstTraverse,
+  inOrderTraverse,
   LinkedList,
   postOrderTraverse,
   preOrderTraverse,
@@ -7,6 +8,68 @@ import {
 
 describe("Graph", () => {
   describe("preOrderTraverse", () => {
+    it("check order", () => {
+      const tree = {
+        val: 1,
+        nodes: [
+          {
+            val: 2,
+            nodes: [{ val: 3 }, { val: 4 }],
+          },
+          {
+            val: 5,
+            nodes: [{ val: 6 }],
+          },
+        ],
+      }
+
+      const output = []
+
+      preOrderTraverse(tree, {
+        onNode(node) {
+          output.push(node.val)
+        },
+      })
+
+      expect(output).toEqual([1, 2, 3, 4, 5, 6])
+    })
+
+    it("check enter leave", () => {
+      const tree = {
+        val: 1,
+        nodes: [
+          {
+            val: 2,
+            nodes: [{ val: 3 }, { val: 4 }],
+          },
+          {
+            val: 5,
+            nodes: [{ val: 6 }],
+          },
+        ],
+      }
+
+      const output = []
+
+      preOrderTraverse(tree, {
+        onNodeEnter(node) {
+          output.push([0, node.val])
+        },
+        onNodeLeave(node) {
+          output.push([1, node.val])
+        },
+      })
+
+      expect(output).toEqual([
+        [0, 1],
+        [0, 2],
+        [1, 2],
+        [0, 5],
+        [1, 5],
+        [1, 1],
+      ])
+    })
+
     it("find path", () => {
       function findPath<T>(obj: T, predicate: (_: T) => boolean) {
         const path = []
@@ -136,6 +199,68 @@ describe("Graph", () => {
   })
 
   describe("postOrderTraverse", () => {
+    it("check order", () => {
+      const tree = {
+        val: 1,
+        nodes: [
+          {
+            val: 2,
+            nodes: [{ val: 3 }, { val: 4 }],
+          },
+          {
+            val: 5,
+            nodes: [{ val: 6 }],
+          },
+        ],
+      }
+
+      const output = []
+
+      postOrderTraverse(tree, {
+        onNode(node) {
+          output.push(node.val)
+        },
+      })
+
+      expect(output).toEqual([3, 4, 2, 6, 5, 1])
+    })
+
+    it("check enter leave", () => {
+      const tree = {
+        val: 1,
+        nodes: [
+          {
+            val: 2,
+            nodes: [{ val: 3 }, { val: 4 }],
+          },
+          {
+            val: 5,
+            nodes: [{ val: 6 }],
+          },
+        ],
+      }
+
+      const output = []
+
+      postOrderTraverse(tree, {
+        onNodeEnter(node) {
+          output.push([0, node.val])
+        },
+        onNodeLeave(node) {
+          output.push([1, node.val])
+        },
+      })
+
+      expect(output).toEqual([
+        [0, 1],
+        [0, 2],
+        [1, 2],
+        [0, 5],
+        [1, 5],
+        [1, 1],
+      ])
+    })
+
     it("find people in an org", () => {
       interface Node {
         name: string
@@ -179,6 +304,71 @@ describe("Graph", () => {
           return false
         },
       })
+    })
+  })
+
+  describe("inOrderTraverse", () => {
+    it("output sorted binary tree", () => {
+      const nums = {
+        val: 4,
+        left: {
+          val: 2,
+          left: { val: 1 },
+          right: { val: 3 },
+        },
+        right: {
+          val: 6,
+          left: { val: 5 },
+          right: { val: 7 },
+        },
+      }
+
+      const output = []
+
+      inOrderTraverse(nums, {
+        onNode(node) {
+          output.push(node.val)
+        },
+      })
+
+      expect(output).toEqual([1, 2, 3, 4, 5, 6, 7])
+    })
+
+    it("check enter and leave", () => {
+      const nums = {
+        val: 4,
+        left: {
+          val: 2,
+          left: { val: 1 },
+          right: { val: 3 },
+        },
+        right: {
+          val: 6,
+          left: { val: 5 },
+          right: { val: 7 },
+        },
+      }
+
+      const output = []
+
+      inOrderTraverse(nums, {
+        onNodeEnter(node) {
+          output.push([0, node.val])
+        },
+
+        onNodeLeave(node) {
+          output.push([1, node.val])
+        },
+      })
+
+      expect(output).toEqual([
+        [0, 4],
+        [0, 2],
+        [1, 2],
+        [0, 6],
+        [1, 6],
+        [1, 4],
+      ])
     })
   })
 
