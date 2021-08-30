@@ -12,15 +12,35 @@ class Node<T> {
   }
 }
 
+/**
+ * A doubly-linked list.
+ *
+ * ```ts
+ * const list = new DLinkedList<number>()
+ * list.push(2)
+ * list.unshift(1)
+ * list.append([3, 4])
+ * list
+ *   .filter((num) => n % 2 === 0)
+ *   .map((num) => n * 2)
+ *   .forEach((num) => console.log(num))
+ * ```
+ */
 export class DLinkedList<T> implements Iterable<T> {
   private first?: Node<T>
   private last?: Node<T>
   private _length = 0
 
+  /**
+   * Number of elements in the list.
+   */
   get length() {
     return this._length
   }
 
+  /**
+   * Pop an element from the start of the list.
+   */
   shift() {
     const first = this.first
     if (first === undefined) return undefined
@@ -35,6 +55,9 @@ export class DLinkedList<T> implements Iterable<T> {
     return first.val
   }
 
+  /**
+   * Pop an element from the end of the list.
+   */
   pop() {
     const last = this.last
     if (last === undefined) return undefined
@@ -49,6 +72,11 @@ export class DLinkedList<T> implements Iterable<T> {
     return last.val
   }
 
+  /**
+   * Push an element to the start of the list.
+   *
+   * @param val Element to push.
+   */
   unshift(val: T) {
     const node = new Node(val)
     const first = this.first
@@ -62,6 +90,11 @@ export class DLinkedList<T> implements Iterable<T> {
     this._length++
   }
 
+  /**
+   * Push an element to the end of the list.
+   *
+   * @param val Element to push.
+   */
   push(val: T) {
     const node = new Node(val)
     const last = this.last
@@ -75,6 +108,11 @@ export class DLinkedList<T> implements Iterable<T> {
     this._length++
   }
 
+  /**
+   * Push a sequence of elements to the start of the list.
+   *
+   * @param vals Elements to push.
+   */
   prepend(vals: Iterable<T>) {
     let node: Node<T> | undefined
     let curr: Node<T> | undefined
@@ -105,6 +143,11 @@ export class DLinkedList<T> implements Iterable<T> {
     this._length += count
   }
 
+  /**
+   * Push a sequence of elements to the end of the list.
+   *
+   * @param vals Elements to push.
+   */
   append(vals: Iterable<T>) {
     let node: Node<T> | undefined
     let curr: Node<T> | undefined
@@ -135,6 +178,9 @@ export class DLinkedList<T> implements Iterable<T> {
     this._length += count
   }
 
+  /**
+   * Make instance iterable.
+   */
   [Symbol.iterator](): Iterator<T> {
     let cur = this.first
     return {
@@ -156,11 +202,19 @@ export class DLinkedList<T> implements Iterable<T> {
     }
   }
 
-  forEach(fn: (_: T) => void) {
+  /**
+   * Iterate through the list.
+   */
+  forEach(fn: (x: T) => void) {
     seq.forEach(this, fn)
   }
 
-  map<U>(fn: (_: T) => U) {
+  /**
+   * Map the list elements.
+   *
+   * @returns A new list instance.
+   */
+  map<U>(fn: (x: T) => U) {
     const newList = new DLinkedList<U>()
     for (const x of this) {
       newList.push(fn(x))
@@ -168,7 +222,12 @@ export class DLinkedList<T> implements Iterable<T> {
     return newList
   }
 
-  filter(predicate: (_: T) => boolean) {
+  /**
+   * Filter the list.
+   *
+   * @returns A new list instance.
+   */
+  filter(predicate: (x: T) => boolean) {
     const newList = new DLinkedList<T>()
     for (const x of this) {
       if (predicate(x)) {
@@ -178,19 +237,35 @@ export class DLinkedList<T> implements Iterable<T> {
     return newList
   }
 
+  /**
+   * Perform reduce on the list.
+   *
+   * @returns The reduced value.
+   */
   reduce<U>(fn: (prev: U, curr: T) => U, initialValue?: U) {
     return seq.reduce(this, fn, initialValue)
   }
 
-  find(predicate: (_: T) => boolean) {
+  /**
+   * Find a specific element in the list.
+   *
+   * @returns Element found or `undefined` otherwise.
+   */
+  find(predicate: (x: T) => boolean) {
     return seq.find(this, predicate)
   }
 
-  some(predicate: (_: T) => boolean) {
+  /**
+   * Check if at least one element meets the predicate.
+   */
+  some(predicate: (x: T) => boolean) {
     return seq.some(this, predicate)
   }
 
-  every(predicate: (_: T) => boolean) {
+  /**
+   * Check if all elements meet the predicate.
+   */
+  every(predicate: (x: T) => boolean) {
     return seq.every(this, predicate)
   }
 }

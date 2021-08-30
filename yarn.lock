@@ -3385,6 +3385,11 @@ typedoc-default-themes@^0.12.10:
   resolved "https://registry.npm.taobao.org/typedoc-default-themes/download/typedoc-default-themes-0.12.10.tgz?cache=0&sync_timestamp=1616728533259&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Ftypedoc-default-themes%2Fdownload%2Ftypedoc-default-themes-0.12.10.tgz#614c4222fe642657f37693ea62cad4dafeddf843"
   integrity sha1-YUxCIv5kJlfzdpPqYsrU2v7d+EM=
 
+typedoc-plugin-param-names@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.nlark.com/typedoc-plugin-param-names/download/typedoc-plugin-param-names-3.0.1.tgz#4423a694a692ab992a4426de6ba086a4d3b46d06"
+  integrity sha1-RCOmlKaSq5kqRCbea6CGpNO0bQY=
+
 typedoc@^0.21.9:
   version "0.21.9"
   resolved "https://registry.nlark.com/typedoc/download/typedoc-0.21.9.tgz#6fbdc7152024a00f03af53a0ca40f44e91f0f129"

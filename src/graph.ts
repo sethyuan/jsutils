@@ -1,21 +1,86 @@
 import { Queue } from "./queue"
 import { reverseArray } from "./seq"
 
+/**
+ * Nodes are delivered to this handler while traversing.
+ *
+ * @param node Node traversed.
+ * @param index Node index within its parent node. For a binary tree,
+ * `0` means it's the left child, `1` means it's the right child.
+ *
+ * @returns You can return `true` if you want to interrupt the traversal,
+ * otherwise you return nothing or `false`.
+ */
 export type NodeHandler<T> = (node: T, index: number) => boolean | void
 
+/**
+ * Optional arguments for a pre-order/post-order traversal.
+ */
 export type PrePostOptions<T> = {
+  /**
+   * A function that returns the subnodes if any given a node.
+   *
+   * *Defaults to* `(node) => node.nodes`
+   */
   children?: (node: T) => T[] | undefined
+  /**
+   * Nodes traversed can be handled by this function.
+   */
   onNode?: NodeHandler<T>
+  /**
+   * If a node has descendant, this function will get called before
+   * traversing descendants.
+   */
   onNodeEnter?: NodeHandler<T>
+  /**
+   * If a node has descendant nodes, this function will get called
+   * after traversing all descendants.
+   */
   onNodeLeave?: NodeHandler<T>
 }
 
+/**
+ * Optional arguments for an in-order traversal.
+ */
 export type InOptions<T> = {
+  /**
+   * A function that returns the left child if any given a node.
+   */
   left?: (node: T) => T | undefined
+  /**
+   * A function that returns the right child if any given a node.
+   */
   right?: (node: T) => T | undefined
+  /**
+   * Nodes traversed can be handled by this function.
+   */
   onNode?: NodeHandler<T>
+  /**
+   * If a node has descendant, this function will get called
+   * before traversing descendants.
+   */
   onNodeEnter?: NodeHandler<T>
+  /**
+   * If a node has descendant nodes, this function will get called
+   * after traversing all descendants.
+   */
   onNodeLeave?: NodeHandler<T>
+}
+
+/**
+ * Optional arguments for an breadth-first traversal.
+ */
+export type BFOptions<T> = {
+  /**
+   * A function that returns the subnodes if any given a node.
+   *
+   * *Defaults to* `(node) => node.nodes`
+   */
+  children?: (node: T) => T[] | undefined
+  /**
+   * Nodes traversed can be handled by this function.
+   */
+  onNode?: (node: T) => boolean | void
 }
 
 const SELF = 0
@@ -35,6 +100,11 @@ class Node<T> {
   }
 }
 
+/**
+ * Traverse a tree like object in pre-order.
+ *
+ * @param root The tree like object to traverse to.
+ */
 export function preOrderTraverse<T extends Record<string, any>>(
   root: T,
   {
@@ -63,6 +133,11 @@ export function preOrderTraverse<T extends Record<string, any>>(
   }
 }
 
+/**
+ * Traverse a tree like object in post-order.
+ *
+ * @param root The tree like object to traverse to.
+ */
 export function postOrderTraverse<T extends Record<string, any>>(
   root: T,
   {
@@ -93,6 +168,11 @@ export function postOrderTraverse<T extends Record<string, any>>(
   }
 }
 
+/**
+ * Traverse a binary tree like object in in-order.
+ *
+ * @param root The tree like object to traverse to.
+ */
 export function inOrderTraverse<T extends Record<string, any>>(
   root: T,
   {
@@ -126,15 +206,14 @@ export function inOrderTraverse<T extends Record<string, any>>(
   }
 }
 
+/**
+ * Breadth first traverse a tree like object.
+ *
+ * @param root The tree like object to traverse to.
+ */
 export function breadthFirstTraverse<T extends Record<string, any>>(
   root: T,
-  {
-    children = (node: T) => node.nodes,
-    onNode,
-  }: {
-    children?: (node: T) => T[] | undefined
-    onNode?: (node: T) => boolean | void
-  } = {},
+  { children = (node: T) => node.nodes, onNode }: BFOptions<T> = {},
 ) {
   const queue = new Queue<T>()
   queue.push(root)

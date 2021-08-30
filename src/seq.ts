@@ -1,27 +1,43 @@
+/**
+ * Reverse an array and return a sequence.
+ */
 export function* reverseArray<T>(arr: T[]) {
+  if (arr == null) return
   for (let i = arr.length - 1; i >= 0; i--) {
     yield arr[i]
   }
 }
 
-export function forEach<T>(seq: Iterable<T>, fn: (_: T) => void) {
+/**
+ * Iterate a sequence in a functional style.
+ */
+export function forEach<T>(seq: Iterable<T>, fn: (x: T) => void) {
   for (const x of seq) {
     fn(x)
   }
 }
 
-export function* map<T, U>(seq: Iterable<T>, fn: (_: T) => U) {
+/**
+ * Map and return a new sequence.
+ */
+export function* map<T, U>(seq: Iterable<T>, fn: (x: T) => U) {
   for (const x of seq) {
     yield fn(x)
   }
 }
 
-export function* filter<T>(seq: Iterable<T>, predicate: (_: T) => boolean) {
+/**
+ * Filter and return a new sequence.
+ */
+export function* filter<T>(seq: Iterable<T>, predicate: (x: T) => boolean) {
   for (const x of seq) {
     if (predicate(x)) yield x
   }
 }
 
+/**
+ * Perform reduce on a sequence.
+ */
 export function reduce<T, U>(
   seq: Iterable<T>,
   fn: (prev: U, curr: T) => U,
@@ -38,21 +54,30 @@ export function reduce<T, U>(
   return prev as U
 }
 
-export function find<T>(seq: Iterable<T>, predicate: (_: T) => boolean) {
+/**
+ * Find an element in a sequence.
+ */
+export function find<T>(seq: Iterable<T>, predicate: (x: T) => boolean) {
   for (const x of seq) {
     if (predicate(x)) return x
   }
   return undefined
 }
 
-export function some<T>(seq: Iterable<T>, predicate: (_: T) => boolean) {
+/**
+ * Check if an element in the sequence meets predicate.
+ */
+export function some<T>(seq: Iterable<T>, predicate: (x: T) => boolean) {
   for (const x of seq) {
     if (predicate(x)) return true
   }
   return false
 }
 
-export function every<T>(seq: Iterable<T>, predicate: (_: T) => boolean) {
+/**
+ * Check if all elements in the sequence meet predicate.
+ */
+export function every<T>(seq: Iterable<T>, predicate: (x: T) => boolean) {
   for (const x of seq) {
     if (!predicate(x)) return false
   }

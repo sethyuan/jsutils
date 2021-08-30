@@ -1,6 +1,6 @@
 {
   "name": "jsutils",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Utilities for JavaScript.",
   "main": "dist/jsutils.js",
   "module": "dist/index.esm.js",
@@ -60,6 +60,7 @@
     "rollup": "^2.54.0",
     "tslib": "^2.3.0",
     "typedoc": "^0.21.9",
+    "typedoc-plugin-param-names": "^3.0.1",
     "typescript": "^4.3.5"
   }
 }

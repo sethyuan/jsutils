@@ -1,4 +1,5 @@
 export * from "./date"
+export * from "./deque"
 export * from "./doubly-linked-list"
 export * from "./graph"
 export * from "./heap"

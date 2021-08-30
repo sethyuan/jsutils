@@ -5,7 +5,7 @@ function stdTimezoneOffset(date: Date) {
 }
 
 /**
- * Returns true if given date is DST, false otherwise.
+ * Returns true if given `date` is DST, false otherwise.
  */
 export function isDst(date: Date) {
   return date.getTimezoneOffset() < stdTimezoneOffset(date)

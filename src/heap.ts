@@ -1,14 +1,26 @@
+/**
+ * MaxHeap
+ */
 export class MaxHeap {
   private _data: number[] = []
 
+  /**
+   * Number of elements in the heap.
+   */
   get length() {
     return this._data.length
   }
 
+  /**
+   * Preview the root value.
+   */
   peep(): number | undefined {
     return this._data[0]
   }
 
+  /**
+   * Push a value onto the heap/
+   */
   push(val: number) {
     const data = this._data
     data.push(val)
@@ -21,6 +33,9 @@ export class MaxHeap {
     }
   }
 
+  /**
+   * Pop the root value.
+   */
   pop() {
     const data = this._data
     if (data.length <= 1) return data.pop()
@@ -47,17 +62,29 @@ export class MaxHeap {
   }
 }
 
+/**
+ * MinHeap
+ */
 export class MinHeap {
   private _data: number[] = []
 
+  /**
+   * Number of elements in the heap.
+   */
   get length() {
     return this._data.length
   }
 
+  /**
+   * Preview the root value.
+   */
   peep() {
     return this._data[0]
   }
 
+  /**
+   * Push a value onto the heap/
+   */
   push(val: number) {
     const data = this._data
     data.push(val)
@@ -70,6 +97,9 @@ export class MinHeap {
     }
   }
 
+  /**
+   * Pop the root value.
+   */
   pop() {
     const data = this._data
     if (data.length <= 1) return data.pop()
