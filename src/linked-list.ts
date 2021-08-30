@@ -11,9 +11,9 @@ class Node<T> {
 }
 
 export class LinkedList<T> implements Iterable<T> {
-  first?: Node<T>
-  last?: Node<T>
-  _length = 0
+  private first?: Node<T>
+  private last?: Node<T>
+  private _length = 0
 
   get length() {
     return this._length

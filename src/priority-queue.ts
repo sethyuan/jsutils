@@ -2,9 +2,9 @@ import { MaxHeap, MinHeap } from "./heap"
 import { Queue } from "./queue"
 
 abstract class PriorityQueue<T> {
-  abstract _priorities: MaxHeap | MinHeap
-  _data = new Map<number, Queue<T>>()
-  _length = 0
+  protected abstract _priorities: MaxHeap | MinHeap
+  private _data = new Map<number, Queue<T>>()
+  private _length = 0
 
   get length() {
     return this._length
@@ -38,9 +38,9 @@ abstract class PriorityQueue<T> {
 }
 
 export class MaxPriorityQueue<T> extends PriorityQueue<T> {
-  _priorities = new MaxHeap()
+  protected _priorities = new MaxHeap()
 }
 
 export class MinPriorityQueue<T> extends PriorityQueue<T> {
-  _priorities = new MinHeap()
+  protected _priorities = new MinHeap()
 }

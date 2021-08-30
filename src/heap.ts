@@ -1,5 +1,5 @@
 export class MaxHeap {
-  _data: number[] = []
+  private _data: number[] = []
 
   get length() {
     return this._data.length
@@ -48,7 +48,7 @@ export class MaxHeap {
 }
 
 export class MinHeap {
-  _data: number[] = []
+  private _data: number[] = []
 
   get length() {
     return this._data.length

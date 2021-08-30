@@ -1,16 +1,16 @@
 import { Queue } from "./queue"
 import { reverseArray } from "./seq"
 
-type NodeHandler<T> = (node: T, index: number) => boolean | void
+export type NodeHandler<T> = (node: T, index: number) => boolean | void
 
-type PrePostOptions<T> = {
+export type PrePostOptions<T> = {
   children?: (node: T) => T[] | undefined
   onNode?: NodeHandler<T>
   onNodeEnter?: NodeHandler<T>
   onNodeLeave?: NodeHandler<T>
 }
 
-type InOptions<T> = {
+export type InOptions<T> = {
   left?: (node: T) => T | undefined
   right?: (node: T) => T | undefined
   onNode?: NodeHandler<T>
