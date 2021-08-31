@@ -19,23 +19,7 @@ console.log(mod(-6, 5)) // 4
 
 ## API
 
-### General
-
-### jsutils.randomInt(from, to)
-
-Returns random integers between `from` and `to` inclusive. `from` and `to` can be negative.
-
-### Math
-
-### jsutils.math.mod(x, y)
-
-Real modulo operation that supports negative numbers.
-
-### Date
-
-### jsutils.date.isDst(date)
-
-Returns true if given `date` is DST, false otherwise.
+See the API documentation [here](https://sethyuan.gitee.io/jsutils/).
 
 ## License
 

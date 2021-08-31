@@ -24,6 +24,20 @@ export class Deque<T> {
   }
 
   /**
+   * Preview the element to shift next.
+   */
+  peekStart() {
+    return this._list.first?.val
+  }
+
+  /**
+   * Preview the element to pop next.
+   */
+  peekEnd() {
+    return this._list.last?.val
+  }
+
+  /**
    * Push an element to the end of the queue.
    *
    * @param val Element to push.

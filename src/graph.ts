@@ -103,6 +103,9 @@ class Node<T> {
 /**
  * Traverse a tree like object in pre-order.
  *
+ * See {@link postOrderTraverse} for an example usage.
+ * This function is used in a similar way.
+ *
  * @param root The tree like object to traverse to.
  */
 export function preOrderTraverse<T extends Record<string, any>>(
@@ -135,6 +138,57 @@ export function preOrderTraverse<T extends Record<string, any>>(
 
 /**
  * Traverse a tree like object in post-order.
+ *
+ * ```ts
+ * type ExprNode = {
+ *   op?: "+" | "-" | "*"
+ *   val?: number
+ *   children?: ExprNode[]
+ * }
+ *
+ * const expr: ExprNode = {
+ *   op: "+",
+ *   children: [
+ *     {
+ *       op: "*",
+ *       children: [{ val: 3 }, { val: 4 }, { val: 1 }],
+ *     },
+ *     {
+ *       op: "-",
+ *       children: [{ val: 7 }, { val: 3 }],
+ *     },
+ *   ],
+ * }
+ *
+ * function calc(expr: ExprNode): number {
+ *   const ops = {
+ *     "+": (nums: number[]) => nums.reduce((result, x) => result + x),
+ *     "-": (nums: number[]) => nums.reduce((result, x) => result - x),
+ *     "*": (nums: number[]) => nums.reduce((result, x) => result * x),
+ *   }
+ *   const stack = new Stack<Queue<number>>()
+ *   stack.push(new Queue())
+ *   postOrderTraverse(expr, {
+ *     children(node) {
+ *       return node.children
+ *     },
+ *     onNodeEnter() {
+ *       stack.push(new Queue())
+ *     },
+ *     onNode(node) {
+ *       if (node.val != null) {
+ *         stack.peek().push(node.val)
+ *       } else if (node.op != null) {
+ *         const values = stack.pop().popAll()
+ *         stack.peek().push(ops[node.op](values))
+ *       }
+ *     },
+ *   })
+ *   return stack.pop().pop()
+ * }
+ *
+ * calc(expr) // 16
+ * ```
  *
  * @param root The tree like object to traverse to.
  */
@@ -170,6 +224,11 @@ export function postOrderTraverse<T extends Record<string, any>>(
 
 /**
  * Traverse a binary tree like object in in-order.
+ *
+ * See {@link postOrderTraverse} for an example usage.
+ * This function is used in a similar way, except that
+ * instead of providing a `children` accessor, you
+ * provide `left` and `right` accessors.
  *
  * @param root The tree like object to traverse to.
  */

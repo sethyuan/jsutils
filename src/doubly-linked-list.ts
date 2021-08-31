@@ -27,8 +27,8 @@ class Node<T> {
  * ```
  */
 export class DLinkedList<T> implements Iterable<T> {
-  private first?: Node<T>
-  private last?: Node<T>
+  first?: Node<T>
+  last?: Node<T>
   private _length = 0
 
   /**

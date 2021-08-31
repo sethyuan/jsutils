@@ -4,6 +4,8 @@ import {
   LinkedList,
   postOrderTraverse,
   preOrderTraverse,
+  Queue,
+  Stack,
 } from "../src/index"
 
 describe("Graph", () => {
@@ -155,7 +157,6 @@ describe("Graph", () => {
           } else if (node.val) {
             stack.push(node.val)
           }
-          return false
         }
 
         function onNodeLeave(node: Node) {
@@ -166,7 +167,6 @@ describe("Graph", () => {
             val = stack.pop()
           }
           stack.push(fns[node.op](Array.from(vals)))
-          return false
         }
 
         preOrderTraverse(expr, { onNode, onNodeLeave })
@@ -304,6 +304,57 @@ describe("Graph", () => {
           return false
         },
       })
+    })
+
+    it("calc example", () => {
+      type ExprNode = {
+        op?: "+" | "-" | "*"
+        val?: number
+        children?: ExprNode[]
+      }
+
+      const expr: ExprNode = {
+        op: "+",
+        children: [
+          {
+            op: "*",
+            children: [{ val: 3 }, { val: 4 }, { val: 1 }],
+          },
+          {
+            op: "-",
+            children: [{ val: 7 }, { val: 3 }],
+          },
+        ],
+      }
+
+      function calc(expr: ExprNode): number {
+        const ops = {
+          "+": (nums: number[]) => nums.reduce((result, x) => result + x),
+          "-": (nums: number[]) => nums.reduce((result, x) => result - x),
+          "*": (nums: number[]) => nums.reduce((result, x) => result * x),
+        }
+        const stack = new Stack<Queue<number>>()
+        stack.push(new Queue())
+        postOrderTraverse(expr, {
+          children(node) {
+            return node.children
+          },
+          onNodeEnter() {
+            stack.push(new Queue())
+          },
+          onNode(node) {
+            if (node.val != null) {
+              stack.peek().push(node.val)
+            } else if (node.op != null) {
+              const values = stack.pop().popAll()
+              stack.peek().push(ops[node.op](values))
+            }
+          },
+        })
+        return stack.pop().pop()
+      }
+
+      expect(calc(expr)).toBe(16)
     })
   })
 

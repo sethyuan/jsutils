@@ -14,7 +14,7 @@ export class MaxHeap {
   /**
    * Preview the root value.
    */
-  peep(): number | undefined {
+  peek(): number | undefined {
     return this._data[0]
   }
 
@@ -78,7 +78,7 @@ export class MinHeap {
   /**
    * Preview the root value.
    */
-  peep() {
+  peek() {
     return this._data[0]
   }
 

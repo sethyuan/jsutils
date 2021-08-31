@@ -14,6 +14,13 @@ export class Queue<T> {
   }
 
   /**
+   * Preview the element to pop next.
+   */
+  peek() {
+    return this._list.first?.val
+  }
+
+  /**
    * Push an element onto the queue.
    *
    * @param val Element to push.
@@ -27,5 +34,25 @@ export class Queue<T> {
    */
   pop() {
     return this._list.shift()
+  }
+
+  /**
+   * Pop all the elements left in the queue into an array.
+   *
+   * @returns An array of the elements.
+   */
+  popAll() {
+    const result = Array.from(this._list)
+    this._list = new LinkedList<T>()
+    return result
+  }
+
+  /**
+   * Push all elements given.
+   *
+   * @param vals An iterable of elements to push.
+   */
+  pushAll(vals: Iterable<T>) {
+    this._list.append(vals)
   }
 }

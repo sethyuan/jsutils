@@ -36,7 +36,7 @@ abstract class PriorityQueue<T> {
   pop(): T | undefined {
     const data = this._data
     const priorities = this._priorities
-    const priority = priorities.peep()
+    const priority = priorities.peek()
     if (!priority) return undefined
     const list = data.get(priority)!
     const val = list.pop()!
@@ -46,6 +46,18 @@ abstract class PriorityQueue<T> {
     }
     this._length--
     return val
+  }
+
+  /**
+   * Preview the element to pop next.
+   */
+  peek() {
+    const data = this._data
+    const priorities = this._priorities
+    const priority = priorities.peek()
+    if (!priority) return undefined
+    const list = data.get(priority)!
+    return list.peek()
   }
 }
 
