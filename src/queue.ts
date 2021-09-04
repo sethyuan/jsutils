@@ -7,6 +7,17 @@ export class Queue<T> {
   private _list = new LinkedList<T>()
 
   /**
+   * Create a new queue with an optional initial element.
+   *
+   * @param initial Optional initial element.
+   */
+  constructor(initial?: T) {
+    if (initial !== undefined) {
+      this._list.push(initial)
+    }
+  }
+
+  /**
    * Number of elements in the queue.
    */
   get length() {
