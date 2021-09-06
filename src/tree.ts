@@ -231,11 +231,17 @@ export function dfs<T, Params, Return>(
 
 export type BfsOptions<T> = {
   /**
-   * Handling of non-leaf node..
+   * Handling of non-leaf node.
+   *
+   * @returns True if you want to interrupt the traversal of the rest of
+   * the nodes.
    */
   onNode?: (node: T, index: number) => boolean | void
   /**
-   * Handling of leaf node..
+   * Handling of leaf node.
+   *
+   * @returns True if you want to interrupt the traversal of the rest of
+   * the nodes.
    */
   onLeaf?: (node: T, index: number) => boolean | void
 }
