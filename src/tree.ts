@@ -49,11 +49,11 @@ export type PostHandler<T, Params, Return> = (
   interrupt?: boolean
 }
 
-export type DfOptions<T, Params, Return> = {
-  preHandler?: Handler<T, Params, Return>
-  postHandler?: PostHandler<T, Params, Return>
-  inHandler?: Handler<T, Params, Return>
-  leafHandler?: Handler<T, Params, Return>
+export type DfsOptions<T, Params, Return> = {
+  onPre?: Handler<T, Params, Return>
+  onPost?: PostHandler<T, Params, Return>
+  onIn?: Handler<T, Params, Return>
+  onLeaf?: Handler<T, Params, Return>
 }
 
 const NODE = 0
@@ -80,12 +80,7 @@ export function dfs<T, Params, Return>(
   root: T,
   children: ChildrenGetter<T>,
   params: Params,
-  {
-    preHandler,
-    postHandler,
-    inHandler,
-    leafHandler,
-  }: DfOptions<T, Params, Return> = {},
+  { onPre, onPost, onIn, onLeaf }: DfsOptions<T, Params, Return> = {},
 ) {
   const nodeStack = new Stack(
     new Node(root, 0, children(root)?.length ? NODE : LEAF),
@@ -118,64 +113,64 @@ export function dfs<T, Params, Return>(
       contextStack.push(
         new Context<Params, Return>(contextStack.peek()!.params, {}, []),
       )
-      if (!preHandler) continue
+      if (!onPre) continue
       const context = contextStack.peek()!
       contextStack.push(context)
-      if (preHandler(node, context, index)) break
+      if (onPre(node, context, index)) break
     } else if (type === IN) {
-      if (!inHandler) continue
+      if (!onIn) continue
       const context = contextStack.peek()!
-      if (inHandler(node, context, index)) break
+      if (onIn(node, context, index)) break
     } else if (type === POST) {
       const context = contextStack.pop()!
-      if (!postHandler) continue
-      const { value, interrupt } = postHandler(node, context, index)
+      if (!onPost) continue
+      const { value, interrupt } = onPost(node, context, index)
       contextStack.peek()!.childReturns[index] = value
       if (interrupt) break
     } else if (type === LEAF) {
-      if (!leafHandler) continue
+      if (!onLeaf) continue
       const context = contextStack.peek()!
-      if (leafHandler(node, context, index)) break
+      if (onLeaf(node, context, index)) break
     }
   }
   return contextStack.pop()!.childReturns.pop()
 }
 
-/**
- * Optional arguments for an breadth-first traversal.
- */
-export type BFOptions<T> = {
-  /**
-   * A function that returns the subnodes if any given a node.
-   *
-   * *Defaults to* `(node) => node.nodes`
-   */
-  children?: ChildrenGetter<T>
-  /**
-   * Nodes traversed can be handled by this function.
-   */
-  onNode?: (node: T) => boolean | void
+export type BfsOptions<T> = {
+  onNode?: (node: T, index: number) => boolean | void
+  onLeaf?: (node: T, index: number) => boolean | void
 }
 
 /**
  * Breadth first traverse a tree like object.
  *
  * @param root The tree like object to traverse to.
+ * @param children The accessor function that returns the child nodes if any.
  */
-export function bfs<T extends Record<string, any>>(
+export function bfs<T extends { [key: string]: any }>(
   root: T,
-  { children = (node: T) => node.nodes, onNode }: BFOptions<T> = {},
+  children: ChildrenGetter<T>,
+  { onNode, onLeaf }: BfsOptions<T> = {},
 ) {
-  const queue = new Queue<T>()
-  queue.push(root)
+  const queue = new Queue(
+    new Node(root, 0, children(root)?.length ? NODE : LEAF),
+  )
   while (queue.length > 0) {
-    const node = queue.pop()!
-    if (onNode?.(node)) break
-    const subnodes = children(node)
-    if (subnodes?.length) {
-      for (const n of subnodes) {
-        queue.push(n)
+    const { node, index, type } = queue.pop()!
+    if (type === NODE) {
+      if (onNode?.(node, index)) break
+      const subnodes = children(node)
+      const len = subnodes?.length
+      if (len) {
+        for (let i = 0; i < len; i++) {
+          const subnode = subnodes[i]
+          queue.push(
+            new Node(subnode, i, children(subnode)?.length ? NODE : LEAF),
+          )
+        }
       }
+    } else if (type === LEAF) {
+      if (onLeaf?.(node, index)) break
     }
   }
 }

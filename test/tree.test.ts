@@ -1,6 +1,121 @@
-import { dfs } from "../src/index"
+import { bfs, dfs } from "../src/index"
 
 describe("Traversals", () => {
+  test("pre-order output", () => {
+    const tree = {
+      name: "A",
+      nodes: [
+        {
+          name: "B",
+          nodes: [{ name: "C" }, { name: "D", nodes: [{ name: "E" }] }],
+        },
+        {
+          name: "F",
+          nodes: [{ name: "G" }, { name: "H" }],
+        },
+      ],
+    }
+
+    const nodes = []
+    dfs(tree, (node: any) => node.nodes, null, {
+      onPre(node) {
+        nodes.push(node.name)
+      },
+      onLeaf(node) {
+        nodes.push(node.name)
+      },
+    })
+    expect(nodes).toEqual(["A", "B", "C", "D", "E", "F", "G", "H"])
+  })
+
+  test("post-order output", () => {
+    const tree = {
+      name: "A",
+      nodes: [
+        {
+          name: "B",
+          nodes: [{ name: "C" }, { name: "D", nodes: [{ name: "E" }] }],
+        },
+        {
+          name: "F",
+          nodes: [{ name: "G" }, { name: "H" }],
+        },
+      ],
+    }
+
+    const nodes = []
+    dfs(tree, (node: any) => node.nodes, null, {
+      onPost(node) {
+        nodes.push(node.name)
+        return { value: null }
+      },
+      onLeaf(node) {
+        nodes.push(node.name)
+      },
+    })
+    expect(nodes).toEqual(["C", "E", "D", "B", "G", "H", "F", "A"])
+  })
+
+  test("in-order output", () => {
+    const tree = {
+      name: "A",
+      nodes: [
+        {
+          name: "B",
+          nodes: [
+            { name: "C" },
+            { name: "D", nodes: [{ name: "E" }, { name: "Z" }] },
+          ],
+        },
+        {
+          name: "F",
+          nodes: [{ name: "G" }, { name: "H" }],
+        },
+      ],
+    }
+
+    const nodes = []
+    dfs(tree, (node: any) => node.nodes, null, {
+      onIn(node) {
+        nodes.push(node.name)
+      },
+      onLeaf(node) {
+        nodes.push(node.name)
+      },
+    })
+    expect(nodes).toEqual(["C", "B", "E", "D", "Z", "A", "G", "F", "H"])
+  })
+
+  test("breadth first output", () => {
+    const tree = {
+      name: "A",
+      nodes: [
+        {
+          name: "B",
+          nodes: [
+            { name: "C" },
+            { name: "D", nodes: [{ name: "E" }, { name: "Z" }] },
+          ],
+        },
+        {
+          name: "F",
+          nodes: [{ name: "G" }, { name: "H" }],
+        },
+      ],
+    }
+
+    const nodes = []
+    bfs(tree, (node: any) => node.nodes, {
+      onNode(node) {
+        nodes.push(node.name)
+      },
+      onLeaf(node) {
+        nodes.push(node.name)
+      },
+    })
+    expect(nodes).toEqual(["A", "B", "F", "C", "D", "G", "H", "E", "Z"])
+  })
+
   test("post-order calc example", () => {
     type ExprNode = {
       op?: "+" | "-" | "*"
@@ -33,10 +148,10 @@ describe("Traversals", () => {
       (node) => node.children,
       null,
       {
-        leafHandler(node, { childReturns }) {
+        onLeaf(node, { childReturns }) {
           childReturns.push(node.val!)
         },
-        postHandler(node, { childReturns }) {
+        onPost(node, { childReturns }) {
           return { value: ops[node.op!](childReturns) }
         },
       },
@@ -89,12 +204,14 @@ describe("Traversals", () => {
 
     function findPath(obj: Node, predicate: (node: Node) => boolean) {
       return dfs<Node, number[], number[]>(obj, (node) => node.nodes, [], {
-        preHandler(node, context, index) {
+        onPre(node, context, index) {
           context.params = [...context.params, index]
-          context.childReturns.push(context.params)
-          if (predicate(node)) return true
+          if (predicate(node)) {
+            context.childReturns.push(context.params)
+            return true
+          }
         },
-        leafHandler(node, context, index) {
+        onLeaf(node, context, index) {
           if (predicate(node)) {
             context.childReturns.push([...context.params, index])
             return true
