@@ -2,14 +2,14 @@ import { Queue } from "./queue"
 import { Stack } from "./stack"
 
 /**
- * A function that returns the subnodes if any given a node.
+ * The accessor function that returns the child nodes if any.
  */
 export type ChildrenGetter<T> = (node: T) => T[] | undefined | null
 
 /**
- * Context of the current node non-leaf node.
+ * Context of the current non-leaf node.
  */
-export class Context<Params, Return> {
+export class TraversalContext<Params, Return> {
   /**
    * Parameters given to the current processing.
    */
@@ -34,15 +34,34 @@ export class Context<Params, Return> {
   }
 }
 
-export type Handler<T, Params, Return> = (
+/**
+ * Node processing.
+ *
+ * If this is a non-leaf node handler and you want to return prematurely,
+ * you can push the return value in `context.childReturns` and gives a
+ * `true` as function's return value.
+ *
+ * If this is a leaf node handler, you can push the return value into
+ * `context.childReturns`.
+ *
+ * @returns True if you want to interrupt the traversal of the rest of
+ * the nodes.
+ */
+export type NodeHandler<T, Params, Return> = (
   node: T,
-  context: Context<Params, Return>,
+  context: TraversalContext<Params, Return>,
   index: number,
 ) => boolean | void
 
-export type PostHandler<T, Params, Return> = (
+/**
+ * Node processing at post-order position.
+ *
+ * @returns The value of the processing and whether you want to interrupt
+ * the traversal of the rest of the nodes.
+ */
+export type PostNodeHandler<T, Params, Return> = (
   node: T,
-  context: Context<Params, Return>,
+  context: TraversalContext<Params, Return>,
   index: number,
 ) => {
   value: Return
@@ -50,10 +69,22 @@ export type PostHandler<T, Params, Return> = (
 }
 
 export type DfsOptions<T, Params, Return> = {
-  onPre?: Handler<T, Params, Return>
-  onPost?: PostHandler<T, Params, Return>
-  onIn?: Handler<T, Params, Return>
-  onLeaf?: Handler<T, Params, Return>
+  /**
+   * Handling of non-leaf node at pre-order position.
+   */
+  onPre?: NodeHandler<T, Params, Return>
+  /**
+   * Handling of non-leaf node at post-order position.
+   */
+  onPost?: PostNodeHandler<T, Params, Return>
+  /**
+   * Handling of non-leaf node at in-order position.
+   */
+  onIn?: NodeHandler<T, Params, Return>
+  /**
+   * Handling of leaf node..
+   */
+  onLeaf?: NodeHandler<T, Params, Return>
 }
 
 const NODE = 0
@@ -76,6 +107,64 @@ class Node<T> {
   }
 }
 
+/**
+ * This is a general and efficient iterative version of depth first
+ * search/traversal.
+ *
+ * @example
+ * ```ts
+ * type ExprNode = {
+ *   op?: "+" | "-" | "*"
+ *   val?: number
+ *   children?: ExprNode[]
+ * }
+ *
+ * const expr: ExprNode = {
+ *   op: "+",
+ *   children: [
+ *     {
+ *       op: "*",
+ *       children: [{ val: 3 }, { val: 4 }, { val: 1 }],
+ *     },
+ *     {
+ *       op: "-",
+ *       children: [{ val: 7 }, { val: 3 }],
+ *     },
+ *   ],
+ * }
+ *
+ * const ops = {
+ *   "+": (nums: number[]) => nums.reduce((result, x) => result + x),
+ *   "-": (nums: number[]) => nums.reduce((result, x) => result - x),
+ *   "*": (nums: number[]) => nums.reduce((result, x) => result * x),
+ * }
+ *
+ * const ret = dfs<ExprNode, null, number>(
+ *   expr,
+ *   (node) => node.children,
+ *   null,
+ *   {
+ *     onLeaf(node, { childReturns }) {
+ *       childReturns.push(node.val!)
+ *     },
+ *     onPost(node, { childReturns }) {
+ *       return { value: ops[node.op!](childReturns) }
+ *     },
+ *   },
+ * )
+ * ```
+ *
+ * @typeParam T Node type
+ * @typeParam Params Parameters type
+ * @typeParam Return The return value type
+ *
+ * @param root The root node of a tree like object to begin search with.
+ * @param children An accessor function that returns the sub-nodes if any.
+ * @param params Optional parameters that can be used during traversal.
+ * Give it a `null` if you don't need it.
+ *
+ * @returns The evaluation result of the traversal.
+ */
 export function dfs<T, Params, Return>(
   root: T,
   children: ChildrenGetter<T>,
@@ -85,8 +174,8 @@ export function dfs<T, Params, Return>(
   const nodeStack = new Stack(
     new Node(root, 0, children(root)?.length ? NODE : LEAF),
   )
-  const contextStack = new Stack<Context<Params, Return>>(
-    new Context<Params, Return>(params, {}, []),
+  const contextStack = new Stack<TraversalContext<Params, Return>>(
+    new TraversalContext<Params, Return>(params, {}, []),
   )
   while (nodeStack.length > 0) {
     const { node, index, type } = nodeStack.pop()!
@@ -111,7 +200,11 @@ export function dfs<T, Params, Return>(
       nodeStack.push(new Node(node, index, PRE))
     } else if (type === PRE) {
       contextStack.push(
-        new Context<Params, Return>(contextStack.peek()!.params, {}, []),
+        new TraversalContext<Params, Return>(
+          contextStack.peek()!.params,
+          {},
+          [],
+        ),
       )
       if (!onPre) continue
       const context = contextStack.peek()!
@@ -133,11 +226,17 @@ export function dfs<T, Params, Return>(
       if (onLeaf(node, context, index)) break
     }
   }
-  return contextStack.pop()!.childReturns.pop()
+  return contextStack.pop()!.childReturns.pop()!
 }
 
 export type BfsOptions<T> = {
+  /**
+   * Handling of non-leaf node..
+   */
   onNode?: (node: T, index: number) => boolean | void
+  /**
+   * Handling of leaf node..
+   */
   onLeaf?: (node: T, index: number) => boolean | void
 }
 
@@ -163,7 +262,7 @@ export function bfs<T extends { [key: string]: any }>(
       const len = subnodes?.length
       if (len) {
         for (let i = 0; i < len; i++) {
-          const subnode = subnodes[i]
+          const subnode = subnodes![i]
           queue.push(
             new Node(subnode, i, children(subnode)?.length ? NODE : LEAF),
           )
