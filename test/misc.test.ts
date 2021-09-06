@@ -1,4 +1,14 @@
-import { randomInt } from "../src/index"
+import { mod, randomInt } from "../src/misc"
+
+describe("mod", () => {
+  it("positive %", () => {
+    expect(mod(6, 5)).toBe(1)
+  })
+
+  it("negative %", () => {
+    expect(mod(-6, 5)).toBe(4)
+  })
+})
 
 describe("random", () => {
   it("1 to 1", () => {
