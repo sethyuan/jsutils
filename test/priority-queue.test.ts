@@ -1,13 +1,13 @@
 import { MaxPriorityQueue, MinPriorityQueue } from "../src/index"
 
 describe("MaxPriorityQueue", () => {
-  it("empty queue", () => {
+  test("empty queue", () => {
     const q = new MaxPriorityQueue()
     expect(q.length).toBe(0)
     expect(q.pop()).toBe(undefined)
   })
 
-  it("single element", () => {
+  test("single element", () => {
     const q = new MaxPriorityQueue<string>()
     q.push(1, "s1")
     expect(q.length).toBe(1)
@@ -15,7 +15,7 @@ describe("MaxPriorityQueue", () => {
     expect(q.length).toBe(0)
   })
 
-  it("multiple elements", () => {
+  test("multiple elements", () => {
     const q = new MaxPriorityQueue<string>()
     q.push(1, "s1")
     q.push(2, "s2")
@@ -31,7 +31,7 @@ describe("MaxPriorityQueue", () => {
     expect(q.length).toBe(0)
   })
 
-  it("multiple elements of the same priority", () => {
+  test("multiple elements of the same priority", () => {
     const q = new MaxPriorityQueue<string>()
     q.push(1, "s1")
     q.push(1, "s2")
@@ -49,13 +49,13 @@ describe("MaxPriorityQueue", () => {
 })
 
 describe("MinPriorityQueue", () => {
-  it("empty queue", () => {
+  test("empty queue", () => {
     const q = new MinPriorityQueue()
     expect(q.length).toBe(0)
     expect(q.pop()).toBe(undefined)
   })
 
-  it("single element", () => {
+  test("single element", () => {
     const q = new MinPriorityQueue<string>()
     q.push(1, "s1")
     expect(q.length).toBe(1)
@@ -63,7 +63,7 @@ describe("MinPriorityQueue", () => {
     expect(q.length).toBe(0)
   })
 
-  it("multiple elements", () => {
+  test("multiple elements", () => {
     const q = new MinPriorityQueue<string>()
     q.push(1, "s1")
     q.push(2, "s2")
@@ -79,7 +79,7 @@ describe("MinPriorityQueue", () => {
     expect(q.length).toBe(0)
   })
 
-  it("multiple elements of the same priority", () => {
+  test("multiple elements of the same priority", () => {
     const q = new MinPriorityQueue<string>()
     q.push(1, "s1")
     q.push(1, "s2")

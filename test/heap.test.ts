@@ -1,13 +1,13 @@
 import { MaxHeap, MinHeap } from "../src/index"
 
 describe("MaxHeap", () => {
-  it("empty", () => {
+  test("empty", () => {
     const h = new MaxHeap()
     expect(h.length).toBe(0)
     expect(h.pop()).toBe(undefined)
   })
 
-  it("multiple numbers", () => {
+  test("multiple numbers", () => {
     const h = new MaxHeap()
     h.push(2)
     h.push(1)
@@ -23,13 +23,13 @@ describe("MaxHeap", () => {
 })
 
 describe("MinHeap", () => {
-  it("empty", () => {
+  test("empty", () => {
     const h = new MinHeap()
     expect(h.length).toBe(0)
     expect(h.pop()).toBe(undefined)
   })
 
-  it("multiple numbers", () => {
+  test("multiple numbers", () => {
     const h = new MinHeap()
     h.push(2)
     h.push(1)

@@ -76,7 +76,7 @@ class Node<T> {
   }
 }
 
-export function depthFirst<T, Params, Return>(
+export function dfs<T, Params, Return>(
   root: T,
   children: ChildrenGetter<T>,
   params: Params,
@@ -162,7 +162,7 @@ export type BFOptions<T> = {
  *
  * @param root The tree like object to traverse to.
  */
-export function breadthFirstTraverse<T extends Record<string, any>>(
+export function bfs<T extends Record<string, any>>(
   root: T,
   { children = (node: T) => node.nodes, onNode }: BFOptions<T> = {},
 ) {

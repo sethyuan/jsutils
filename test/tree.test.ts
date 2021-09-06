@@ -1,4 +1,4 @@
-import { depthFirst } from "../src"
+import { dfs } from "../src/index"
 
 describe("Traversals", () => {
   test("post-order calc example", () => {
@@ -28,7 +28,7 @@ describe("Traversals", () => {
       "*": (nums: number[]) => nums.reduce((result, x) => result * x),
     }
 
-    const ret = depthFirst<ExprNode, null, number>(
+    const ret = dfs<ExprNode, null, number>(
       expr,
       (node) => node.children,
       null,
@@ -88,24 +88,19 @@ describe("Traversals", () => {
     }
 
     function findPath(obj: Node, predicate: (node: Node) => boolean) {
-      return depthFirst<Node, number[], number[]>(
-        obj,
-        (node) => node.nodes,
-        [],
-        {
-          preHandler(node, context, index) {
-            context.params = [...context.params, index]
-            context.childReturns.push(context.params)
-            if (predicate(node)) return true
-          },
-          leafHandler(node, context, index) {
-            if (predicate(node)) {
-              context.childReturns.push([...context.params, index])
-              return true
-            }
-          },
+      return dfs<Node, number[], number[]>(obj, (node) => node.nodes, [], {
+        preHandler(node, context, index) {
+          context.params = [...context.params, index]
+          context.childReturns.push(context.params)
+          if (predicate(node)) return true
         },
-      ).slice(1)
+        leafHandler(node, context, index) {
+          if (predicate(node)) {
+            context.childReturns.push([...context.params, index])
+            return true
+          }
+        },
+      }).slice(1)
     }
 
     const path = findPath(root, (node) => node.name === "F")
