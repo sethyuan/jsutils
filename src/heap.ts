@@ -5,6 +5,11 @@ export class MaxHeap<T = number> {
   private _data: T[] = []
   private _accessor: (x?: T) => number | undefined
 
+  /**
+   * Make an instance of MaxHeap.
+   *
+   * @param accessor Accessor function that gives the number to sort to.
+   */
   constructor(accessor: (x?: T) => number | undefined = (x) => x as any) {
     this._accessor = accessor
   }
@@ -72,10 +77,15 @@ export class MaxHeap<T = number> {
 /**
  * MinHeap
  */
-export class MinHeap<T> {
+export class MinHeap<T = number> {
   private _data: T[] = []
   private _accessor: (x?: T) => number | undefined
 
+  /**
+   * Make an instance of MinHeap.
+   *
+   * @param accessor Accessor function that gives the number to sort to.
+   */
   constructor(accessor: (x?: T) => number | undefined = (x) => x as any) {
     this._accessor = accessor
   }
