@@ -177,3 +177,10 @@ test("filter", () => {
   expect(filtered instanceof DLinkedList).toBe(true)
   expect(Array.from(filtered)).toEqual([2, 4])
 })
+
+test("toString", () => {
+  const list = new DLinkedList<number>()
+  list.push(1)
+  list.push(2)
+  expect(list.toString()).toBe("DLinkedList:1,2")
+})

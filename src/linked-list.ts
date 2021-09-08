@@ -235,4 +235,8 @@ export class LinkedList<T> implements Iterable<T> {
   every(predicate: (_: T) => boolean) {
     return seq.every(this, predicate)
   }
+
+  toString() {
+    return `LinkedList:${Array.from(this)}`
+  }
 }

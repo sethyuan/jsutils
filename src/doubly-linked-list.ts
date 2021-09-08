@@ -268,4 +268,8 @@ export class DLinkedList<T> implements Iterable<T> {
   every(predicate: (x: T) => boolean) {
     return seq.every(this, predicate)
   }
+
+  toString() {
+    return `DLinkedList:${Array.from(this)}`
+  }
 }
