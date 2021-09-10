@@ -204,15 +204,15 @@ describe("Traversals", () => {
     function findPath(obj: Node, predicate: (node: Node) => boolean) {
       return dfs<Node, number[], number[]>(obj, (node) => node.nodes, [], {
         onPre(node, context, index) {
-          context.params = [...context.params, index]
+          context.param = [...context.param, index]
           if (predicate(node)) {
-            context.returnValue = context.params
+            context.returnValue = context.param
             return true
           }
         },
         onLeaf(node, context, index) {
           if (predicate(node)) {
-            context.returnValue = [...context.params, index]
+            context.returnValue = [...context.param, index]
             return true
           }
         },

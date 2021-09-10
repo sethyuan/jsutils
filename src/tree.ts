@@ -9,11 +9,11 @@ export type ChildrenGetter<T> = (node: T) => T[] | undefined | null
 /**
  * Context of the current non-leaf node.
  */
-export class TraversalContext<Params, Return> {
+export class TraversalContext<Param, Return> {
   /**
    * Parameters given to the current processing.
    */
-  params: Params
+  param: Param
   /**
    * Local data specific to this context.
    */
@@ -27,14 +27,10 @@ export class TraversalContext<Params, Return> {
    */
   returnValue?: Return
 
-  constructor(
-    params: Params,
-    locals: { [key: string]: any },
-    childReturns: Return[],
-  ) {
-    this.params = params
-    this.locals = locals
-    this.childReturns = childReturns
+  constructor(param: Param) {
+    this.param = param
+    this.locals = {}
+    this.childReturns = []
   }
 }
 
@@ -51,29 +47,29 @@ export class TraversalContext<Params, Return> {
  * @returns True if you want to interrupt the traversal of the rest of
  * the nodes.
  */
-export type NodeHandler<T, Params, Return> = (
+export type NodeHandler<T, Param, Return> = (
   node: T,
-  context: TraversalContext<Params, Return>,
+  context: TraversalContext<Param, Return>,
   index: number,
 ) => boolean | void
 
-export type DfsOptions<T, Params, Return> = {
+export type DfsOptions<T, Param, Return> = {
   /**
    * Handling of non-leaf node at pre-order position.
    */
-  onPre?: NodeHandler<T, Params, Return>
+  onPre?: NodeHandler<T, Param, Return>
   /**
    * Handling of non-leaf node at post-order position.
    */
-  onPost?: NodeHandler<T, Params, Return>
+  onPost?: NodeHandler<T, Param, Return>
   /**
    * Handling of non-leaf node at in-order position.
    */
-  onIn?: NodeHandler<T, Params, Return>
+  onIn?: NodeHandler<T, Param, Return>
   /**
    * Handling of leaf node..
    */
-  onLeaf?: NodeHandler<T, Params, Return>
+  onLeaf?: NodeHandler<T, Param, Return>
 }
 
 const NODE = 0
@@ -144,27 +140,27 @@ class Node<T> {
  * ```
  *
  * @typeParam T Node type
- * @typeParam Params Parameters type
+ * @typeParam Param Parameters type
  * @typeParam Return The return value type
  *
  * @param root The root node of a tree like object to begin search with.
  * @param children An accessor function that returns the sub-nodes if any.
- * @param params Optional parameters that can be used during traversal.
+ * @param param Optional parameters that can be used during traversal.
  * Give it a `null` if you don't need it.
  *
  * @returns The evaluation result of the traversal.
  */
-export function dfs<T, Params, Return>(
+export function dfs<T, Param, Return>(
   root: T,
   children: ChildrenGetter<T>,
-  params: Params,
-  { onPre, onPost, onIn, onLeaf }: DfsOptions<T, Params, Return> = {},
+  param: Param,
+  { onPre, onPost, onIn, onLeaf }: DfsOptions<T, Param, Return> = {},
 ) {
   const nodeStack = new Stack(
     new Node(root, 0, children(root)?.length ? NODE : LEAF),
   )
-  const contextStack = new Stack<TraversalContext<Params, Return>>(
-    new TraversalContext<Params, Return>(params, {}, []),
+  const contextStack = new Stack<TraversalContext<Param, Return>>(
+    new TraversalContext<Param, Return>(param),
   )
   while (nodeStack.length > 0) {
     const { node, index, type } = nodeStack.pop()!
@@ -189,11 +185,7 @@ export function dfs<T, Params, Return>(
       nodeStack.push(new Node(node, index, PRE))
     } else if (type === PRE) {
       contextStack.push(
-        new TraversalContext<Params, Return>(
-          contextStack.peek()!.params,
-          {},
-          [],
-        ),
+        new TraversalContext<Param, Return>(contextStack.peek()!.param),
       )
       if (!onPre) continue
       const context = contextStack.peek()!
@@ -220,7 +212,9 @@ export function dfs<T, Params, Return>(
       if (interrupt) break
     } else if (type === LEAF) {
       if (!onLeaf) continue
-      const context = new TraversalContext<Params, Return>( contextStack.peek()!.params, {}, [], )
+      const context = new TraversalContext<Param, Return>(
+        contextStack.peek()!.param,
+      )
       const interrupt = onLeaf(node, context, index)
       if (context.returnValue !== undefined) {
         contextStack.peek()!.childReturns.push(context.returnValue)
