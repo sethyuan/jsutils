@@ -47,7 +47,6 @@ describe("Traversals", () => {
     dfs(tree, (node: any) => node.nodes, null, {
       onPost(node) {
         nodes.push(node.name)
-        return { value: null }
       },
       onLeaf(node) {
         nodes.push(node.name)
@@ -148,11 +147,11 @@ describe("Traversals", () => {
       (node) => node.children,
       null,
       {
-        onLeaf(node, { childReturns }) {
-          childReturns.push(node.val!)
+        onLeaf(node, context) {
+          context.returnValue = node.val
         },
-        onPost(node, { childReturns }) {
-          return { value: ops[node.op!](childReturns) }
+        onPost(node, context) {
+          context.returnValue = ops[node.op!](context.childReturns)
         },
       },
     )
@@ -207,13 +206,13 @@ describe("Traversals", () => {
         onPre(node, context, index) {
           context.params = [...context.params, index]
           if (predicate(node)) {
-            context.childReturns.push(context.params)
+            context.returnValue = context.params
             return true
           }
         },
         onLeaf(node, context, index) {
           if (predicate(node)) {
-            context.childReturns.push([...context.params, index])
+            context.returnValue = [...context.params, index]
             return true
           }
         },

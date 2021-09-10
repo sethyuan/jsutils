@@ -22,6 +22,10 @@ export class TraversalContext<Params, Return> {
    * The value of each child after evaluation.
    */
   childReturns: Return[]
+  /**
+   * The value the current processing returns.
+   */
+  returnValue?: Return
 
   constructor(
     params: Params,
@@ -53,21 +57,6 @@ export type NodeHandler<T, Params, Return> = (
   index: number,
 ) => boolean | void
 
-/**
- * Node processing at post-order position.
- *
- * @returns The value of the processing and whether you want to interrupt
- * the traversal of the rest of the nodes.
- */
-export type PostNodeHandler<T, Params, Return> = (
-  node: T,
-  context: TraversalContext<Params, Return>,
-  index: number,
-) => {
-  value: Return
-  interrupt?: boolean
-}
-
 export type DfsOptions<T, Params, Return> = {
   /**
    * Handling of non-leaf node at pre-order position.
@@ -76,7 +65,7 @@ export type DfsOptions<T, Params, Return> = {
   /**
    * Handling of non-leaf node at post-order position.
    */
-  onPost?: PostNodeHandler<T, Params, Return>
+  onPost?: NodeHandler<T, Params, Return>
   /**
    * Handling of non-leaf node at in-order position.
    */
@@ -144,11 +133,11 @@ class Node<T> {
  *   (node) => node.children,
  *   null,
  *   {
- *     onLeaf(node, { childReturns }) {
- *       childReturns.push(node.val!)
+ *     onLeaf(node, context) {
+ *       context.returnValue = node.val
  *     },
- *     onPost(node, { childReturns }) {
- *       return { value: ops[node.op!](childReturns) }
+ *     onPost(node, context) {
+ *       context.returnValue = ops[node.op!](context.childReturns)
  *     },
  *   },
  * )
@@ -208,25 +197,38 @@ export function dfs<T, Params, Return>(
       )
       if (!onPre) continue
       const context = contextStack.peek()!
-      contextStack.push(context)
-      if (onPre(node, context, index)) break
+      const interrupt = onPre(node, context, index)
+      if (context.returnValue !== undefined) {
+        contextStack.peek()!.childReturns.push(context.returnValue)
+      }
+      if (interrupt) break
     } else if (type === IN) {
       if (!onIn) continue
       const context = contextStack.peek()!
-      if (onIn(node, context, index)) break
+      const interrupt = onIn(node, context, index)
+      if (context.returnValue !== undefined) {
+        contextStack.peek()!.childReturns.push(context.returnValue)
+      }
+      if (interrupt) break
     } else if (type === POST) {
       const context = contextStack.pop()!
       if (!onPost) continue
-      const { value, interrupt } = onPost(node, context, index)
-      contextStack.peek()!.childReturns[index] = value
+      const interrupt = onPost(node, context, index)
+      if (context.returnValue !== undefined) {
+        contextStack.peek()!.childReturns.push(context.returnValue)
+      }
       if (interrupt) break
     } else if (type === LEAF) {
       if (!onLeaf) continue
-      const context = contextStack.peek()!
-      if (onLeaf(node, context, index)) break
+      const context = new TraversalContext<Params, Return>( contextStack.peek()!.params, {}, [], )
+      const interrupt = onLeaf(node, context, index)
+      if (context.returnValue !== undefined) {
+        contextStack.peek()!.childReturns.push(context.returnValue)
+      }
+      if (interrupt) break
     }
   }
-  return contextStack.pop()!.childReturns.pop()!
+  return contextStack.pop()!.childReturns.pop()
 }
 
 export type BfsOptions<T> = {
