@@ -61,9 +61,9 @@ export type StartContext<Param> = {
  * @returns The result of the whole recursion.
  */
 export function rec2iter<Param, Return>(
-  param: Param,
   start: (param: Param, context: StartContext<Param>) => Return,
   consume: (param: Param, returns?: Return[], locals?: Locals) => Return,
+  param: Param,
 ) {
   const stack = new Stack<Item<Param>>([param, FRAME])
   const contextStack = new Stack<Context<Param, Return>>({ param })
@@ -102,4 +102,57 @@ export function rec2iter<Param, Return>(
     }
   }
   return contextStack.pop()!.returns?.pop()
+}
+
+/**
+ * Same functionality as {@link rec2iter} but with a simpler interface.
+ * For large recursions however, it's slow than {@link rec2iter}.
+ *
+ * @example
+ * ```ts
+ * function factorial(n: number) {
+ *   return recurse<number, number>(function* (n) {
+ *     if (n <= 1) return 1
+ *     const [fac_n_minus_1] = yield [n - 1]
+ *     return n * fac_n_minus_1
+ *   }, n)
+ * }
+ * ```
+ *
+ * @param body A generator function working as the main body for recursion,
+ * it yields recursions.
+ * @param initialParam Initial parameter.
+ */
+export function recurse<Param, Return>(
+  body: (param: Param) => Generator<Param[], Return, Return[]>,
+  initialParam: Param,
+) {
+  const stack = new Stack<[Param, Generator<Param[], Return, Return[]> | null]>(
+    [initialParam, null],
+  )
+  const contextStack = new Stack<Return[]>([])
+  while (stack.length > 0) {
+    const [param, control] = stack.pop()!
+    if (control === null) {
+      const control = body(param)
+      const { value, done } = control.next()
+      if (!done) {
+        contextStack.push([])
+        stack.push([param, control])
+        stack.pushAll(
+          (value as Param[]).map((recursionParam) => [recursionParam, null]),
+          true,
+        )
+      } else {
+        contextStack.peek()!.push(value as Return)
+      }
+    } else {
+      const returns = contextStack.pop()!
+      const { value } = control.next(returns)
+      if (value !== undefined) {
+        contextStack.peek()!.push(value as Return)
+      }
+    }
+  }
+  return contextStack.pop()!.pop() as Return
 }
