@@ -225,21 +225,8 @@ export function dfs<T, Param, Return>(
   return contextStack.pop()!.childReturns.pop()
 }
 
-export type BfsOptions<T> = {
-  /**
-   * Handling of non-leaf node.
-   *
-   * @returns True if you want to interrupt the traversal of the rest of
-   * the nodes.
-   */
-  onNode?: (node: T, index: number) => boolean | void
-  /**
-   * Handling of leaf node.
-   *
-   * @returns True if you want to interrupt the traversal of the rest of
-   * the nodes.
-   */
-  onLeaf?: (node: T, index: number) => boolean | void
+export type BfsContext = {
+  cut?: boolean
 }
 
 /**
@@ -247,31 +234,28 @@ export type BfsOptions<T> = {
  *
  * @param root The tree like object to traverse to.
  * @param children The accessor function that returns the child nodes if any.
+ * @param onNode Handling of the node. Return true if you want to interrupt
+ * the whole traversal, or use `context.cut` to indicate you don't want to
+ * go down this path.
  */
 export function bfs<T extends { [key: string]: any }>(
   root: T,
   children: ChildrenGetter<T>,
-  { onNode, onLeaf }: BfsOptions<T> = {},
+  onNode: (node: T, context: BfsContext, index: number) => boolean | void,
 ) {
-  const queue = new Queue(
-    new Node(root, 0, children(root)?.length ? NODE : LEAF),
-  )
+  const queue = new Queue(new Node(root, 0, NODE))
   while (queue.length > 0) {
-    const { node, index, type } = queue.pop()!
-    if (type === NODE) {
-      if (onNode?.(node, index)) break
-      const subnodes = children(node)
-      const len = subnodes?.length
-      if (len) {
-        for (let i = 0; i < len; i++) {
-          const subnode = subnodes![i]
-          queue.push(
-            new Node(subnode, i, children(subnode)?.length ? NODE : LEAF),
-          )
-        }
+    const { node, index } = queue.pop()!
+    const context: BfsContext = {}
+    if (onNode(node, context, index)) break
+    if (context.cut) continue
+    const subnodes = children(node)
+    const len = subnodes?.length
+    if (len) {
+      for (let i = 0; i < len; i++) {
+        const subnode = subnodes![i]
+        queue.push(new Node(subnode, i, NODE))
       }
-    } else if (type === LEAF) {
-      if (onLeaf?.(node, index)) break
     }
   }
 }

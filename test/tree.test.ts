@@ -104,15 +104,46 @@ describe("Traversals", () => {
     }
 
     const nodes = []
-    bfs(tree, (node: any) => node.nodes, {
-      onNode(node) {
+    bfs(
+      tree,
+      (node: any) => node.nodes,
+      (node) => {
         nodes.push(node.name)
       },
-      onLeaf(node) {
-        nodes.push(node.name)
-      },
-    })
+    )
     expect(nodes).toEqual(["A", "B", "F", "C", "D", "G", "H", "E", "Z"])
+  })
+
+  test("breadth first traversal with cut", () => {
+    const tree = {
+      name: "A",
+      nodes: [
+        {
+          name: "B",
+          nodes: [
+            { name: "C" },
+            { name: "D", nodes: [{ name: "E" }, { name: "Z" }] },
+          ],
+        },
+        {
+          name: "F",
+          nodes: [{ name: "G" }, { name: "H" }],
+        },
+      ],
+    }
+
+    const nodes = []
+    bfs(
+      tree,
+      (node: any) => node.nodes,
+      (node, context) => {
+        nodes.push(node.name)
+        if (node.name === "B") {
+          context.cut = true
+        }
+      },
+    )
+    expect(nodes).toEqual(["A", "B", "F", "G", "H"])
   })
 
   test("post-order calc example", () => {
