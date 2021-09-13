@@ -1,16 +1,32 @@
 import { Stack } from "./stack"
 
 type Locals = { [key: string]: any }
-type Context<Param, Return> = {
+
+class Context<Param, Return> {
   param: Param
   returns?: Return[]
   locals?: Locals
+
+  constructor(param: Param, locals?: Locals) {
+    this.param = param
+    this.locals = locals
+  }
 }
 
 const ITEM = 0
 const FRAME = 1
+
 type ItemType = typeof ITEM | typeof FRAME
-type Item<Param> = [Param, ItemType]
+
+class Item<Param> {
+  param: Param
+  type: ItemType
+
+  constructor(param: Param, type: ItemType) {
+    this.param = param
+    this.type = type
+  }
+}
 
 /**
  * You can use this context for storing local variables and/or specify
@@ -65,21 +81,20 @@ export function rec2iter<Param, Return>(
   consume: (param: Param, returns?: Return[], locals?: Locals) => Return,
   param: Param,
 ) {
-  const stack = new Stack<Item<Param>>([param, FRAME])
-  const contextStack = new Stack<Context<Param, Return>>({ param })
+  const stack = new Stack(new Item(param, FRAME))
+  const contextStack = new Stack<Context<Param, Return>>(new Context(param))
   while (stack.length > 0) {
-    const [param, type] = stack.pop()!
+    const { param, type } = stack.pop()!
     if (type === FRAME) {
       const startContext: StartContext<Param> = {}
       const v = start(param, startContext)
       if (startContext.recursions?.length) {
-        contextStack.push({ param, locals: startContext.locals })
-        stack.push([param, ITEM])
+        contextStack.push(new Context(param, startContext.locals))
+        stack.push(new Item(param, ITEM))
         stack.pushAll(
-          startContext.recursions.map((recursionParam) => [
-            recursionParam,
-            FRAME,
-          ]),
+          startContext.recursions.map(
+            (recursionParam) => new Item(recursionParam, FRAME),
+          ),
           true,
         )
       } else {
@@ -101,7 +116,7 @@ export function rec2iter<Param, Return>(
       }
     }
   }
-  return contextStack.pop()!.returns?.pop()
+  return contextStack.pop()!.returns?.pop() as Return
 }
 
 /**
