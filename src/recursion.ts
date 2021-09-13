@@ -57,22 +57,22 @@ export type StartContext<Param> = {
  * ```ts
  * function factorial(n: number) {
  *   return rec2iter(
- *     n,
  *     (n, context) => {
  *       if (n <= 1) return 1
  *       context.recursions = [n - 1]
  *     },
  *     (n, [fac_n_minus_1]) => n * fac_n_minus_1,
+ *     n,
  *   )
  * }
  * ```
  *
- * @param param The initial parameters to kick off the recursion.
  * @param start The start phase where you write everything that runs before
  * recursive calls. You also specify what recursions you want to run next
  * here.
  * @param consume The consume phase where you can get all recursive calls'
  * return values.
+ * @param param The initial parameters to kick off the recursion.
  *
  * @returns The result of the whole recursion.
  */
