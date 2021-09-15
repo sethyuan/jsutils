@@ -1,4 +1,4 @@
-import { bfs, dfs } from "../src/index"
+import { bfs, dfs, filterTree, mapTree } from "../src/index"
 
 describe("Traversals", () => {
   test("pre-order output", () => {
@@ -252,5 +252,120 @@ describe("Traversals", () => {
 
     const path = findPath(root, (node) => node.name === "F")
     expect(path).toEqual([0, 1, 1])
+  })
+})
+
+describe("common sequence ops on tree", () => {
+  type Node = {
+    val: number
+    left?: Node
+    right?: Node
+  }
+
+  let root: Node
+
+  beforeEach(() => {
+    root = {
+      val: 1,
+      left: {
+        val: 2,
+        left: {
+          val: 3,
+          left: { val: 4 },
+          right: { val: 5 },
+        },
+        right: {
+          val: 6,
+          left: { val: 7 },
+          right: { val: 8 },
+        },
+      },
+      right: { val: 9 },
+    }
+  })
+
+  test("map", () => {
+    function map(root: Node, mapper: (node: Node, index: number) => Node) {
+      return mapTree(
+        root,
+        (node) => (node.left == null ? [] : [node.left, node.right]),
+        (parent, index, node) => {
+          if (index === 0) {
+            parent.left = node
+          } else {
+            parent.right = node
+          }
+        },
+        mapper,
+      )
+    }
+
+    const newTree = map(root, (node, index) => {
+      if (node.val % 2 !== 0) {
+        return { ...node, val: node.val * index }
+      }
+      return { ...node }
+    })
+
+    const arr = []
+    bfs(
+      newTree,
+      (node) => (node.left == null ? [] : [node.left, node.right]),
+      (node) => {
+        arr.push(node.val)
+      },
+    )
+    expect(arr).toEqual([0, 2, 9, 0, 6, 4, 5, 0, 8])
+  })
+
+  test("filter", () => {
+    function filter(
+      root: Node,
+      predicate: (node: Node, index: number) => boolean,
+    ) {
+      return filterTree(
+        root,
+        (node) =>
+          node.left == null && node.right == null
+            ? []
+            : node.left == null
+            ? [node.right]
+            : node.right == null
+            ? [node.left]
+            : [node.left, node.right],
+        (parent, index, node?) => {
+          if (index === 0) {
+            parent.left = node
+          } else if (parent.left) {
+            parent.right = node
+          } else {
+            parent.left = node
+            parent.right = undefined
+          }
+        },
+        predicate,
+      )
+    }
+
+    const newTree = filter(root, (node, index) => {
+      return node.val % 2 !== 0
+    })
+
+    const arr = []
+    bfs(
+      newTree,
+      (node) =>
+        node.left == null && node.right == null
+          ? []
+          : node.left == null
+          ? [node.right]
+          : node.right == null
+          ? [node.left]
+          : [node.left, node.right],
+      (node) => {
+        arr.push(node.val)
+      },
+    )
+    expect(arr).toEqual([1, 9])
   })
 })

@@ -77,7 +77,7 @@ export type StartContext<Param> = {
  * @returns The result of the whole recursion.
  */
 export function rec2iter<Param, Return>(
-  start: (param: Param, context: StartContext<Param>) => Return,
+  start: (param: Param, context: StartContext<Param>) => Return | void,
   consume: (param: Param, returns?: Return[], locals?: Locals) => Return,
   param: Param,
 ) {
@@ -102,7 +102,7 @@ export function rec2iter<Param, Return>(
         if (context.returns === undefined) {
           context.returns = []
         }
-        context.returns.push(v)
+        context.returns.push(v!)
       }
     } /* type === ITEM */ else {
       const { param, returns, locals } = contextStack.pop()!
