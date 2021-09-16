@@ -1,8 +1,8 @@
 {
   "name": "jsutils",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Utilities for JavaScript.",
-  "main": "dist/jsutils.js",
+  "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,

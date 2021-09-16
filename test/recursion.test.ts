@@ -125,10 +125,9 @@ describe("rec2iter", () => {
 describe("recurse", () => {
   test("fib", () => {
     function fib(n: number) {
-      return recurse(function* (n) {
+      return recurse<number, number>(function* (n) {
         if (n <= 1) return 1
-        const [n2, n1]: number[] = yield [n - 2, n - 1]
-        return n2 + n1
+        return (yield n - 2) + (yield n - 1)
       }, n)
     }
 
@@ -137,10 +136,9 @@ describe("recurse", () => {
 
   test("factorial", () => {
     function factorial(n: number) {
-      return recurse(function* (n) {
+      return recurse<number, number>(function* (n) {
         if (n <= 1) return 1
-        const [fac_n_minus_1]: number[] = yield [n - 1]
-        return n * fac_n_minus_1
+        return n * (yield n - 1)
       }, n)
     }
 
@@ -156,11 +154,10 @@ describe("recurse", () => {
    */
   test("factorial with locals", () => {
     function factorial(n: number) {
-      return recurse<typeof n, number>(function* (n) {
+      return recurse<number, number>(function* (n) {
         if (n <= 1) return 1 * 2
         const doubleN = n * 2
-        const [fac_n_minus_1] = yield [n - 1]
-        return doubleN * fac_n_minus_1
+        return doubleN * (yield n - 1)
       }, n)
     }
 
@@ -196,10 +193,9 @@ describe("recurse", () => {
     }
 
     function calc(expr: ExprNode) {
-      return recurse<typeof expr, number>(function* (node) {
+      return recurse<ExprNode, number>(function* (node) {
         if (node.val !== undefined) return node.val
-        const [left, right] = yield [node.left, node.right]
-        return ops[node.op](left, right)
+        return ops[node.op](yield node.left, yield node.right)
       }, expr)
     }
 
@@ -208,11 +204,11 @@ describe("recurse", () => {
 
   test("reverse array", () => {
     function reverse<T>(arr: T[]) {
-      return recurse<[typeof arr, number, number], void>(
+      return recurse<[T[], number, number], void>(
         function* ([arr, start, end]) {
           if (start >= end) return
           ;[arr[start], arr[end]] = [arr[end], arr[start]]
-          yield [[arr, start + 1, end - 1]]
+          yield [arr, start + 1, end - 1]
         },
         [arr, 0, arr.length - 1],
       )
@@ -225,5 +221,36 @@ describe("recurse", () => {
     const arr2 = [1, 2, 3, 4]
     reverse(arr2)
     expect(arr2).toEqual([4, 3, 2, 1])
+  })
+
+  test("recursions in a loop", () => {
+    function perm(numbers: number[]) {
+      const combinations: number[][] = []
+      recurse<readonly [number[], number[]], void>(
+        function* ([nums, combo]) {
+          if (nums.length === combo.length) {
+            combinations.push(combo.slice())
+            return
+          }
+          for (let i = 0; i < nums.length; i++) {
+            if (combo.includes(nums[i])) continue
+            combo.push(nums[i])
+            yield [nums, combo]
+            combo.pop()
+          }
+        },
+        [numbers, []],
+      )
+      return combinations
+    }
+
+    expect(perm([1, 2, 5])).toEqual([
+      [1, 2, 5],
+      [1, 5, 2],
+      [2, 1, 5],
+      [2, 5, 1],
+      [5, 1, 2],
+      [5, 2, 1],
+    ])
   })
 })

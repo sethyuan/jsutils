@@ -53,6 +53,10 @@ export type StartContext<Param> = {
  * you want to run here; In `consume` phase, you consume all the recursive
  * calls' returns.
  *
+ * **NOTE:** Because it has only 2 phases, it can't support all kinds
+ * of recursion usage, for more complex usages you can use {@link recurse}.
+ * For simpler ones however, this function is faster.
+ *
  * @example
  * ```ts
  * function factorial(n: number) {
@@ -120,16 +124,16 @@ export function rec2iter<Param, Return>(
 }
 
 /**
- * Same functionality as {@link rec2iter} but with a simpler interface.
- * For large recursions however, it's slow than {@link rec2iter}.
+ * It implements an iterative execution of the given recursion. That is,
+ * you write an algorithm in a recursive way, but you get an iterative
+ * execution of it.
  *
  * @example
  * ```ts
  * function factorial(n: number) {
  *   return recurse<number, number>(function* (n) {
  *     if (n <= 1) return 1
- *     const [fac_n_minus_1] = yield [n - 1]
- *     return n * fac_n_minus_1
+ *     return n * (yield n - 1)
  *   }, n)
  * }
  * ```
@@ -139,35 +143,40 @@ export function rec2iter<Param, Return>(
  * @param initialParam Initial parameter.
  */
 export function recurse<Param, Return>(
-  body: (param: Param) => Generator<Param[], Return, Return[]>,
+  body: (param: Param) => Generator<Param, Return, Return>,
   initialParam: Param,
 ) {
-  const stack = new Stack<[Param, Generator<Param[], Return, Return[]> | null]>(
-    [initialParam, null],
-  )
-  const contextStack = new Stack<Return[]>([])
+  const stack = new Stack<[Param, Generator<Param, Return, Return> | null]>([
+    initialParam,
+    null,
+  ])
+  const contextStack = new Stack<Return>()
   while (stack.length > 0) {
     const [param, control] = stack.pop()!
     if (control === null) {
       const control = body(param)
       const { value, done } = control.next()
       if (!done) {
-        contextStack.push([])
+        // has more recursions to do.
         stack.push([param, control])
-        stack.pushAll(
-          (value as Param[]).map((recursionParam) => [recursionParam, null]),
-          true,
-        )
+        stack.push([value as Param, null])
       } else {
-        contextStack.peek()!.push(value as Return)
+        contextStack.push(value as Return)
       }
     } else {
-      const returns = contextStack.pop()!
-      const { value } = control.next(returns)
-      if (value !== undefined) {
-        contextStack.peek()!.push(value as Return)
+      const returns = contextStack.peek()!
+      const { value, done } = control.next(returns)
+      if (!done) {
+        // has more recursions to do.
+        stack.push([param, control])
+        stack.push([value as Param, null])
+      } else {
+        contextStack.pop()
+        if (value !== undefined) {
+          contextStack.push(value as Return)
+        }
       }
     }
   }
-  return contextStack.pop()!.pop() as Return
+  return contextStack.pop() as Return
 }
