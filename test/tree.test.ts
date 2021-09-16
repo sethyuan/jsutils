@@ -115,19 +115,29 @@ describe("Traversals", () => {
   })
 
   test("breadth first traversal with cut", () => {
-    const tree = {
+    type Node = {
+      name: string
+      checked?: boolean
+      nodes?: Node[]
+    }
+
+    const tree: Node = {
       name: "A",
       nodes: [
         {
           name: "B",
           nodes: [
             { name: "C" },
-            { name: "D", nodes: [{ name: "E" }, { name: "Z" }] },
+            {
+              name: "D",
+              checked: true,
+              nodes: [{ name: "E", checked: true }, { name: "Z" }],
+            },
           ],
         },
         {
           name: "F",
-          nodes: [{ name: "G" }, { name: "H" }],
+          nodes: [{ name: "G" }, { name: "H", checked: true }],
         },
       ],
     }
@@ -137,13 +147,13 @@ describe("Traversals", () => {
       tree,
       (node: any) => node.nodes,
       (node, context) => {
-        nodes.push(node.name)
-        if (node.name === "B") {
+        if (node.checked) {
+          nodes.push(node.name)
           context.cut = true
         }
       },
     )
-    expect(nodes).toEqual(["A", "B", "F", "G", "H"])
+    expect(nodes).toEqual(["D", "H"])
   })
 
   test("post-order calc example", () => {

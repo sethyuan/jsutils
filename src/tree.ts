@@ -68,7 +68,7 @@ export type DfsOptions<T, Param, Return> = {
    */
   onIn?: NodeHandler<T, Param, Return>
   /**
-   * Handling of leaf node..
+   * Handling of leaf node.
    */
   onLeaf?: NodeHandler<T, Param, Return>
 }
@@ -233,6 +233,49 @@ export type BfsContext = {
 /**
  * Breadth first traverse a tree like object.
  *
+ * @example
+ * ```ts
+ * type Node = {
+ *   name: string
+ *   checked?: boolean
+ *   nodes?: Node[]
+ * }
+ *
+ * const tree: Node = {
+ *   name: "A",
+ *   nodes: [
+ *     {
+ *       name: "B",
+ *       nodes: [
+ *         { name: "C" },
+ *         {
+ *           name: "D",
+ *           checked: true,
+ *           nodes: [{ name: "E", checked: true }, { name: "Z" }],
+ *         },
+ *       ],
+ *     },
+ *     {
+ *       name: "F",
+ *       nodes: [{ name: "G" }, { name: "H", checked: true }],
+ *     },
+ *   ],
+ * }
+ *
+ * const nodes = []
+ * bfs(
+ *   tree,
+ *   (node: any) => node.nodes,
+ *   (node, context) => {
+ *     if (node.checked) {
+ *       nodes.push(node.name)
+ *       context.cut = true
+ *     }
+ *   },
+ * )
+ * nodes // ["D", "H"]
+ * ```
+ *
  * @param root The tree like object to traverse to.
  * @param children The accessor function that returns the child nodes if any.
  * @param onNode Handling of the node. Return true if you want to interrupt
@@ -277,6 +320,10 @@ export function bfs<T>(
  *     mapper,
  *   )
  * }
+ *
+ * const newTree = map(tree, (node, index) => {
+ *   return { ...node, val: node.val * 2 }
+ * })
  * ```
  *
  * @param root The tree like object to traverse to.
@@ -323,6 +370,10 @@ export function mapTree<T, R>(
  *     predicate,
  *   )
  * }
+ *
+ * const newTree = filter(tree, (node, index) => {
+ *   return node.val % 2 === 0
+ * })
  * ```
  *
  * @param root The tree like object to traverse to.
