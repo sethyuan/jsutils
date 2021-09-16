@@ -1,6 +1,6 @@
 # jsutils
 
-Utilities for JavaScript.
+Utilities for JavaScript and TypeScript.
 
 ## Installation
 
