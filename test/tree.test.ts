@@ -263,6 +263,50 @@ describe("Traversals", () => {
     const path = findPath(root, (node) => node.name === "F")
     expect(path).toEqual([0, 1, 1])
   })
+
+  test("min level of a tree", () => {
+    type Node = {
+      v: number
+      nodes?: Node[]
+    }
+
+    const tree: Node = {
+      v: 1,
+      nodes: [
+        {
+          v: 2,
+          nodes: [
+            {
+              v: 7,
+              nodes: [{ v: 8 }],
+            },
+          ],
+        },
+        {
+          v: 3,
+          nodes: [{ v: 5 }],
+        },
+        {
+          v: 4,
+          nodes: [{ v: 6 }],
+        },
+      ],
+    }
+
+    let depth = 0
+    bfs(
+      tree,
+      (node) => node.nodes,
+      (node) => {
+        if (!node.nodes) return true
+      },
+      (d) => {
+        depth = d
+      },
+    )
+
+    expect(depth).toBe(2)
+  })
 })
 
 describe("common sequence ops on tree", () => {

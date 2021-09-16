@@ -281,26 +281,34 @@ export type BfsContext = {
  * @param onNode Handling of the node. Return true if you want to interrupt
  * the whole traversal, or use `context.cut` to indicate you don't want to
  * go down this path.
+ * @param onLevelStart This gives you an opportunity to handle depth.
  */
 export function bfs<T>(
   root: T,
   children: ChildrenGetter<T>,
   onNode: (node: T, context: BfsContext, index: number) => boolean | void,
+  onLevelStart?: (depth: number) => boolean | void,
 ) {
+  let depth = 0
   const queue = new Queue(new Node(root, 0, NODE))
   while (queue.length > 0) {
-    const { node, index } = queue.pop()!
-    const context: BfsContext = {}
-    if (onNode(node, context, index)) break
-    if (context.cut) continue
-    const subnodes = children(node)
-    const len = subnodes?.length
-    if (len) {
-      for (let i = 0; i < len; i++) {
-        const subnode = subnodes![i]
-        queue.push(new Node(subnode, i, NODE))
+    const len = queue.length
+    if (onLevelStart?.(depth)) return
+    for (let i = 0; i < len; i++) {
+      const { node, index } = queue.pop()!
+      const context: BfsContext = {}
+      if (onNode(node, context, index)) return
+      if (context.cut) continue
+      const subnodes = children(node)
+      const len = subnodes?.length
+      if (len) {
+        for (let i = 0; i < len; i++) {
+          const subnode = subnodes![i]
+          queue.push(new Node(subnode, i, NODE))
+        }
       }
     }
+    depth++
   }
 }
 
