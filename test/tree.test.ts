@@ -156,6 +156,46 @@ describe("Traversals", () => {
     expect(nodes).toEqual(["D", "H"])
   })
 
+  test("breadth first traversal path", () => {
+    type Node = {
+      name: string
+      checked?: boolean
+      nodes?: Node[]
+    }
+
+    const tree: Node = {
+      name: "A",
+      nodes: [
+        {
+          name: "B",
+          nodes: [
+            { name: "C" },
+            {
+              name: "D",
+              checked: true,
+              nodes: [{ name: "E", checked: true }, { name: "Z" }],
+            },
+          ],
+        },
+        {
+          name: "F",
+          nodes: [{ name: "G" }, { name: "H", checked: true }],
+        },
+      ],
+    }
+
+    bfs(
+      tree,
+      (node: any) => node.nodes,
+      (node, context, path, index) => {
+        if (node.name === "E") {
+          expect(path.map((n) => n.name)).toEqual(["A", "B", "D"])
+          expect(index).toBe(0)
+        }
+      },
+    )
+  })
+
   test("post-order calc example", () => {
     type ExprNode = {
       op?: "+" | "-" | "*"

@@ -81,7 +81,7 @@ const POST = 4
 
 type NodeType = typeof NODE | typeof LEAF | typeof PRE | typeof IN | typeof POST
 
-class Node<T> {
+class DfsNode<T> {
   node: T
   index: number
   type: NodeType
@@ -158,7 +158,7 @@ export function dfs<T, Param, Return>(
   { onPre, onPost, onIn, onLeaf }: DfsOptions<T, Param, Return> = {},
 ) {
   const nodeStack = new Stack(
-    new Node(root, 0, children(root)?.length ? NODE : LEAF),
+    new DfsNode(root, 0, children(root)?.length ? NODE : LEAF),
   )
   const contextStack = new Stack<TraversalContext<Param, Return>>(
     new TraversalContext<Param, Return>(param),
@@ -166,24 +166,24 @@ export function dfs<T, Param, Return>(
   while (nodeStack.length > 0) {
     const { node, index, type } = nodeStack.pop()!
     if (type === NODE) {
-      nodeStack.push(new Node(node, index, POST))
+      nodeStack.push(new DfsNode(node, index, POST))
       const subnodes = children(node)!
       const len = subnodes.length
       const half = (subnodes.length / 2) >> 0
       for (let i = len - 1; i >= half; i--) {
         const subnode = subnodes[i]
         nodeStack.push(
-          new Node(subnode, i, children(subnode)?.length ? NODE : LEAF),
+          new DfsNode(subnode, i, children(subnode)?.length ? NODE : LEAF),
         )
       }
-      nodeStack.push(new Node(node, index, IN))
+      nodeStack.push(new DfsNode(node, index, IN))
       for (let i = half - 1; i >= 0; i--) {
         const subnode = subnodes[i]
         nodeStack.push(
-          new Node(subnode, i, children(subnode)?.length ? NODE : LEAF),
+          new DfsNode(subnode, i, children(subnode)?.length ? NODE : LEAF),
         )
       }
-      nodeStack.push(new Node(node, index, PRE))
+      nodeStack.push(new DfsNode(node, index, PRE))
     } else if (type === PRE) {
       contextStack.push(
         new TraversalContext<Param, Return>(contextStack.peek()!.param),
@@ -228,6 +228,18 @@ export function dfs<T, Param, Return>(
 
 export type BfsContext = {
   cut?: boolean
+}
+
+class BfsNode<T> {
+  node: T
+  path: T[]
+  index: number
+
+  constructor(node: T, path: T[], index: number) {
+    this.node = node
+    this.path = path
+    this.index = index
+  }
 }
 
 /**
@@ -286,25 +298,30 @@ export type BfsContext = {
 export function bfs<T>(
   root: T,
   children: ChildrenGetter<T>,
-  onNode: (node: T, context: BfsContext, index: number) => boolean | void,
+  onNode: (
+    node: T,
+    context: BfsContext,
+    path: T[],
+    index: number,
+  ) => boolean | void,
   onLevelStart?: (depth: number) => boolean | void,
 ) {
   let depth = 0
-  const queue = new Queue(new Node(root, 0, NODE))
+  const queue = new Queue(new BfsNode(root, [], 0))
   while (queue.length > 0) {
     const len = queue.length
     if (onLevelStart?.(depth)) return
     for (let i = 0; i < len; i++) {
-      const { node, index } = queue.pop()!
+      const { node, path, index } = queue.pop()!
       const context: BfsContext = {}
-      if (onNode(node, context, index)) return
+      if (onNode(node, context, path, index)) return
       if (context.cut) continue
       const subnodes = children(node)
       const len = subnodes?.length
       if (len) {
         for (let i = 0; i < len; i++) {
           const subnode = subnodes![i]
-          queue.push(new Node(subnode, i, NODE))
+          queue.push(new BfsNode(subnode, [...path, node], i))
         }
       }
     }
