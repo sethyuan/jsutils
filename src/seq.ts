@@ -83,3 +83,31 @@ export function every<T>(seq: Iterable<T>, predicate: (x: T) => boolean) {
   }
   return true
 }
+
+/**
+ * Find the first minimum element in the given sequence.
+ * You need to provide a accessor `by` for the comparison purpose.
+ */
+export function min<T>(seq: Iterable<T>, by: (x: T) => number): T | undefined {
+  let ret
+  for (const x of seq) {
+    if (ret === undefined || by(x) < by(ret)) {
+      ret = x
+    }
+  }
+  return ret
+}
+
+/**
+ * Find the first maximum element in the given sequence.
+ * You need to provide a accessor `by` for the comparison purpose.
+ */
+export function max<T>(seq: Iterable<T>, by: (x: T) => number): T | undefined {
+  let ret
+  for (const x of seq) {
+    if (ret === undefined || by(x) > by(ret)) {
+      ret = x
+    }
+  }
+  return ret
+}
