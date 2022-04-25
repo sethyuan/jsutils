@@ -1,5 +1,5 @@
-import { rec2iter } from "."
 import { Queue } from "./queue"
+import { rec2iter } from "./recursion"
 import { Stack } from "./stack"
 
 /**
