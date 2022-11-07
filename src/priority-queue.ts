@@ -59,6 +59,13 @@ abstract class PriorityQueue<T> {
     const list = data.get(priority)!
     return list.peek()
   }
+
+  /**
+   * Preview the next priority number.
+   */
+  peekPriority() {
+    return this._priorities.peek()
+  }
 }
 
 /**
