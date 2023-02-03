@@ -18,3 +18,10 @@ export function randomInt(from: number, to: number) {
 export function mod(x: number, y: number) {
   return ((x % y) + y) % y
 }
+
+/**
+ * Returns a promise that wait for ms milliseconds.
+ */
+export function waitMs(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
