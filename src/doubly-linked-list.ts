@@ -179,6 +179,15 @@ export class DLinkedList<T> implements Iterable<T> {
   }
 
   /**
+   * Empty the list.
+   */
+  clear() {
+    this.first = undefined
+    this.last = undefined
+    this._length = 0
+  }
+
+  /**
    * Make instance iterable.
    */
   [Symbol.iterator](): Iterator<T> {
