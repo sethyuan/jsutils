@@ -66,6 +66,13 @@ abstract class PriorityQueue<T> {
   peekPriority() {
     return this._priorities.peek()
   }
+
+  /** Clear the queue. */
+  clear() {
+    this._data.clear()
+    this._priorities.clear()
+    this._length = 0
+  }
 }
 
 /**

@@ -66,4 +66,9 @@ export class Queue<T> {
   pushAll(vals: Iterable<T>) {
     this._list.append(vals)
   }
+
+  /** Clear the queue. */
+  clear() {
+    this._list.clear()
+  }
 }

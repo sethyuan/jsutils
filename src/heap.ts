@@ -72,6 +72,11 @@ export class MaxHeap<T = number> {
     }
     return toPop
   }
+
+  /** Clear the heap. */
+  clear() {
+    this._data = []
+  }
 }
 
 /**
@@ -147,5 +152,10 @@ export class MinHeap<T = number> {
       childVal = accessor(data[child]) ?? Infinity
     }
     return toPop
+  }
+
+  /** Clear the heap. */
+  clear() {
+    this._data = []
   }
 }

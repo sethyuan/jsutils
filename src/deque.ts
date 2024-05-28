@@ -68,4 +68,9 @@ export class Deque<T> {
   shift() {
     return this._list.shift()
   }
+
+  /** Clear the queue. */
+  clear() {
+    this._list.clear()
+  }
 }
